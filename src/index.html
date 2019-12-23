@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Ledger Application</title>
+
+<link rel="stylesheet" href="../assets/css/bootstrap/bootstrap.min3.css">
+<!-- <link rel="stylesheet" href="../assets/css/dashboard.css"> -->
+<link rel="stylesheet" href="../assets/css/datetimepicker.css">
+
+<style>
+    /* BT  */
+    
+    /* border hack as fixed  elements overflow */
+    html, body{
+        height: 100%;
+    }
+    body{
+        padding-top: 0px;
+        -webkit-box-shadow: -11px 13px 5px -5px rgba(224,217,224,1);
+        -moz-box-shadow: -11px 13px 5px -5px rgba(224,217,224,1);
+        box-shadow: -11px 13px 5px -5px rgba(224,217,224,1);
+    }
+    .full-height{
+        height: 100%;
+    }
+    div.bt-top-container{
+        border: solid 2px #333;
+        position: relative;
+    }
+    
+    .bt-sidebar{
+        position: absolute;
+        top:0;
+        bottom: 0;
+        background-color: rgb(99, 101, 122);
+        margin-top: 48px;
+    }
+    
+    .bt-sidebar-nav li a{
+        border-bottom: solid 1px rgba(51,51,56,1);
+        background-color: rgb(99, 101, 122);
+        padding: 30px 20px;
+        font-size: 16px;
+        text-align: center;
+        color: rgb(219, 216, 216);
+        
+    }
+    
+    .bt-sidebar-nav li a:hover{
+        background-color: rgb(138, 139, 156)!important;
+        color: whitesmoke;
+    }
+    .bt-sidebar-nav li.active a{
+        background-color: rgb(99, 101, 122);
+        color:rgb(219, 216, 216);
+        -webkit-box-shadow: inset -10px -10px 30px -10px  rgba(51,51,56,1);
+        -moz-box-shadow: inset -10px -10px 30px -10px  rgba(51,51,56,1);
+        box-shadow: inset -10px -10px 30px -10px  rgba(51,51,56,1);
+    }
+    
+    .bt-sub-header{
+        margin: 10px 50px 20px!important;
+        color: #444;
+    }
+    #master-details-box{
+        background-color: #eee;
+        margin-top: 0px;;
+        border-bottom: solid 1px #d1d1d1;
+        flex:0 1 auto;
+    }
+    #master-details-header{
+        margin-top: 0px;
+        padding: 10px 5px 0px;
+        text-align: center;
+        
+    }
+    
+    .bt-content-pane{
+        margin-top: 48px;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        top: 0;
+    }
+    .bt-flex-height-adjust{
+        flex: 1 1 auto;
+        display: flex;
+        flex-flow: column;
+    }
+ 
+
+    #bt-add-content-box{
+        padding: 10px 10px;
+    }
+    
+    .bt-submit-row{
+        padding: 15px 10px 5px;
+        text-align: center;
+    }
+    .bt-below-content-wrapper{
+        padding: 0px 15px;
+        margin: 10px 5px;
+        border: solid 1px #ddd;
+        border-radius: 4px;
+        flex: 1 1 auto;
+    }
+    .bt-below-content{
+        padding-top: 5px;
+    }
+    .bt-navbar-btn{
+        -webkit-app-region: no-drag;
+    }
+    .bt-tab-pane-top-btn-box{
+        padding: 10px 0px;
+        text-align: right;
+    }
+
+
+    /* modified bootstrap */
+    .navbar{
+        border-radius: unset;
+        margin-bottom: 0px;
+        -webkit-user-select: none;
+        -webkit-app-region: drag;
+    }
+    .navbar-collapse{
+        font-size: 24px;
+        padding-right: 0px;
+    }
+    ul.navbar-right:hover{
+        background-color:  #9d9d9d;
+    }
+    ul.navbar-right.close-ul:hover{
+        background-color:  #bb3535;
+    }
+    .form-control-feedback{
+        right:10px;
+    }
+    .page-header{
+        margin:15px 0px 5px;
+        padding-bottom: 10px!important;
+    }
+    .nav-tabs>li>a {
+        padding: 10px 35px;
+    }
+    /* .tab-content .tab-pane{
+        display: none;
+    } */
+</style>
+<script>
+</script>    
+</head>
+<body>
+    <div class="container-fluid bt-top-container full-height">
+        
+        <div class="row">
+            <nav class="navbar  navbar-inverse navbar-fixed-top">
+                <div class="container-fluid">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#">LEDGER</a>
+                    </div>
+                    
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav navbar-right bt-navbar-btn close-ul">
+                            <li>
+                                <a href="#" id="app-close-bt">x</a>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right bt-navbar-btn">
+                            <li>
+                                <a href="#" id="app-maximize-bt">+</a>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right bt-navbar-btn">
+                            <li>
+                                <a href="#" id="app-minimize-bt">-</a>
+                            </li>
+                        </ul>
+                    </div><!-- /.navbar-collapse -->
+                </div><!-- /.container-fluid -->
+            </nav>
+        </div>
+        <div class="row full-height" style="position: relative;overflow-x: hidden;">
+            <div class="col-sm-2 bt-sidebar">
+                <div class="row">
+                    
+                    <ul class="nav bt-sidebar-nav">
+                        <li class="active"><a href="#" data-file="inventory.html" >Inventory</a></li>
+                        <li class=""><a href="#"  data-file="transaction.html" >Transaction</a></li>
+                        <li class=""><a href="#" data-file="report.html" >Report</a></li>
+                        <li ><a href="#" id="default" data-file="setup.html" >Set up</a></li>
+                    </ul>
+                </div>
+                
+            </div>
+            <div class="col-sm-10 bt-content-pane">
+                <div class="row full-height bt-flex-height-adjust">
+                    <div class="col-md-12" id="master-details-box">
+                        <h3  id="master-details-header">Master_Details</h3>
+                    </div>
+                    <div class="col-md-12 bt-flex-height-adjust" >
+                        <p style="margin-bottom: 5px;padding: 5px 15px;;"></p>
+                        <div class="row bt-flex-height-adjust">
+                            <div class="col-sm-12 bt-flex-height-adjust" id="bt-add-content-box">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <div class="col-sm-12"></div> --> <!-- if footer needed -->
+                </div>
+
+            </div> < bt-flex-height-adjust! bt-flex-height-adjust-- size-10 top content box ended -->
+            
+            
+        </div>
+    </div>
+    
+</div>
+
+<script>window.$ = window.jQuery = require('../assets/js/jquery.min.js')</script>
+<script src="./btDashboard.js"></script>
+<script src="../assets/js/bootstrap.min3.js"></script>
+<script src="../assets/js/bootstrap-datetimepicker.min.js"></script>
+
+</body>
+</html>
