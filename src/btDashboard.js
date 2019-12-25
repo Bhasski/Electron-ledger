@@ -88,10 +88,10 @@ function getWindowBounds(remote){
         
         // take  DATA from different forms and send to main.js for further process 
         document.getElementById("bt-add-content-box").addEventListener("click",(e)=>{
-            my_html_magic_lib.doActionOnContent(e,isSetUpNeeded);
+            my_html_magic_lib.doActionOnSetUpContent(e,isSetUpNeeded);
         })// end 'click' delegation on content box
         
-
+        
         
         function isEmptyObj(obj) {
             for(var key in obj) {
@@ -122,7 +122,9 @@ function getWindowBounds(remote){
                         var elem = document.getElementById("bt-add-content-box")
                         elem.innerHTML = xhr.responseText;
                         if(!isSetUpNeeded){
-                            my_html_magic_lib.hideActiveTabPane()
+                            let tabPaneActionEl = document.querySelector(".bt-tab-pane-top-btn-box")
+                            // console.log("Hiiisss")
+                            if(tabPaneActionEl) my_html_magic_lib.hideActiveTabPane()
                         }else{
                             my_html_magic_lib.makeTabActive("ul.nav-tabs li.add-master","#bt-add-content-box .tab-content .tab-pane#add-master")
                         }
@@ -131,22 +133,145 @@ function getWindowBounds(remote){
                 xhr.send();
                 
                 setTimeout(()=>{
-                    
+                    if(file ==="setup.html")my_html_magic_lib.sendTableForRecordBox("Product") //click changes to product data
                     $('.form_datetime').datetimepicker({
                         language:  'en',
                         weekStart: 1,
                         todayBtn:  1,
                         autoclose: 1,
                         todayHighlight: 1,
+                        minView:2,
                         startView: 2,
                         forceParse: 0,
-                        format:'dd/mm/yyyy hh:ii',
-                        showMeridian: 1
+                        format:'dd/mm/yyyy', /* 'dd/mm/yyyy hh:ii' */
+                        /* showMeridian: 1 */
                     });
                 },10)
             } // end if 
         }) // sidebar clicks close
+        
+        /* Tabinf html  magic  on table */
+        
+        document.getElementById("bt-add-content-box").addEventListener("focusin",actionOnTransactionModals)// focusin
 
+        document.getElementById("bt-add-content-box").addEventListener("keyup",actionOnTableModalKeyUp)//key up
+        
+        document.getElementById("bt-add-content-box").addEventListener("mousedown",sendTableModalDataToParent)//key up
+        
+        
+        
+        let tdModalCondtionToFetchData = {}//global
+        
+        
+        function actionOnTableModalKeyUp(e){
+            
+            if(e.key=="Tab" || e.keyCode == '9'){
+                actionOnTransactionModals(e)
+            }//key COde TAB
+            
+            if(e.key=="Enter" || e.keyCode == '13'){
+                // console.log(e.target.className)
+                sendTableModalDataToParent(e)
+                
+            }// key code ENTER
+        }
+        
+        function actionOnTransactionModals(e){
+            let that = e.currentTarget;
+            if(e.target.nodeName =="TD" && e.target.getAttribute("get-data")){
+                let currTabIndex = e.target.getAttribute("tabIndex")
+                let tabIndexForModal = parseInt(currTabIndex)+1
+                let tabIndexForSiblings = parseInt(currTabIndex)+2
+                
+                // pretext for data
+                let colAttr = e.target.getAttribute("get-data")
+                let table  = colAttr.split("-")[0]
+                let tableColumnToFetch = colAttr.split("-")[1]
+                var offset =  _offset(e.target)
+                let targetWidth = e.target.offsetWidth
+                
+                $(e.target).nextAll().attr("tabIndex",tabIndexForSiblings)// IMPORTANT! changing tabIndex for comings TDs
+                
+                if(!e.target.isSameNode(e.target.parentNode.firstElementChild)){
+
+                    if(that.querySelector("td.active-modal")){ //previous active modal if there
+                        let prevModalColumn = that.querySelector("td.active-modal");
+                        let prvColAttr = prevModalColumn.getAttribute("get-data")
+                        let isPrevElDataSet = that.querySelector("td.active-modal").getAttribute("data-set")
+                        if(isPrevElDataSet =="true"){
+                            tdModalCondtionToFetchData[prvColAttr.split("-")[1]] = prevModalColumn.querySelector("b").innerHTML 
+                        }
+                    }
+                }else{  // check for first child,to clear conditions
+                    tdModalCondtionToFetchData = {}
+                }
+                // remove the class now
+                if(that.querySelector("td.active-modal")){
+                    that.querySelector("td.active-modal").classList.remove("active-modal")
+                }
+                let data = {table:table,column:tableColumnToFetch,condition:tdModalCondtionToFetchData}
+                
+                let modalOptions = {
+                    offset:offset,
+                    width:targetWidth,
+                    tabIndex:tabIndexForModal
+                }
+                
+                
+                e.target.classList.add("active-modal")
+                ipc.send("setTransactionModalData",data)
+                showTableColumnModal(modalOptions,targetWidth)
+                
+            }// td with data
+        
+        
+        }
+
+        function sendTableModalDataToParent(e){
+            if(e.target.className == "table-modal-content"){
+                let parent = document.querySelector("td.active-modal")
+                parent.innerHTML = e.target.innerHTML
+                e.target.parentNode.style.display = "none"
+                parent.setAttribute("data-set","true")
+                parent.nextElementSibling.focus()
+            }
+        }
+
+        function showTableColumnModal(modalOptions){
+            var modalEl = document.getElementById("bt-modal-on-table-column")
+            modalEl.style.top = (modalOptions.offset.top+30)+"px"
+            modalEl.style.left = (modalOptions.offset.left-10)+"px"
+            modalEl.style.width = (modalOptions.width+15)+"px"
+            setTimeout(() => {
+                Array.from(modalEl.querySelectorAll(".table-modal-content")).forEach((node)=>{
+                    // console.log(node)
+                    if(node)node.setAttribute("tabIndex",modalOptions.tabIndex)
+                })
+            }, 15);
+            modalEl.style.display = "block"
+        }
+
+        function _getAllOtherSiblingsOfNode(elem){
+            let allOtherSiblings = [],
+            node = elem.parentNode.firstChild;
+            
+            while ( node ) {
+                if ( node !== elem && node.nodeType === Node.ELEMENT_NODE ) 
+                allOtherSiblings.push( node );
+                node = node.nextElementSibling || node.nextSibling;
+            }
+            return allOtherSiblings;
+        }
+        
+        function _offset(el) {
+            var rect = el.getBoundingClientRect(),
+            scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
+            scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            return { top: rect.top + scrollTop, left: rect.left + scrollLeft }
+        }
+        
+        
+        
         /*--------------------- IPC Section -----------------*/
         ipc.on("initData", function(evt,result){
             let resultEl = document.getElementById("master-details-header");
@@ -156,8 +281,9 @@ function getWindowBounds(remote){
                 row['master_address']+"&nbsp;(Mobile: "+row['master_phone']+")</h5>";
             }
         })
-
+        
         ipc.on("dataForRecordBox",(ev,data)=>{
+            // console.log(data)
             let recordEl = document.getElementById("bt-below-content")
             let tHeadStr;
             let tBodyStr = "<tbody>"
@@ -166,15 +292,29 @@ function getWindowBounds(remote){
                 tBodyStr += "<tr>"
                 for (key in row){
                     tHeadStr += "<th>"+key+"</th>"
-                    tBodyStr += "<td>"+row[key]+"</td>"
+                    tBodyStr += (key.includes("name"))? "<td><b>"+row[key]+"</b></td>":(row[key] == null)? "<td>"+" NA "+"</td>":"<td>"+row[key]+"</td>"
                 }
                 tBodyStr += "<td><a><span class=\"glyphicon glyphicon-edit\"></span></td></a></tr>"
             }
             tHeadStr += "<th>Action</th></thead>"
             tBodyStr += "</tbody>"
-            let htmlStr = "<table class=\"table table-condensed table-hover table-striped\">"+tHeadStr+tBodyStr+"</table>"
+            let htmlStr = "<table class=\"table table-bordered table-condensed table-hover table-striped\">"+tHeadStr+tBodyStr+"</table>"
             recordEl.innerHTML = htmlStr;
-        })
+        }) //ipc for record Box
+        
+        ipc.on("onDataForTransactionModal",(ev,data)=>{
+            var modalEl = document.getElementById("bt-modal-on-table-column")
+            // console.log(data)
+            let htmlStr =""
+            for (row of data){
+                for(key in row){
+                    htmlStr +="<div tabIndex='0' class=\"table-modal-content\"><b>"+row[key]+"</b></div>"
+                }
+            }
+            modalEl.innerHTML =htmlStr;
+        })// ipc for tx table modal
+        
+        
         
     })// on content load
     

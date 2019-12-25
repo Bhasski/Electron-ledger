@@ -2,41 +2,42 @@
 const {BrowserWindow, app, Menu, screen} =  require('electron');
 const session = require('electron').session
 
-var myLedgerMains = require('./src/bt_ledger_main')
+
 
 /* HOT reload files , not for production*/
-// require('electron-reload')(__dirname, {
-//   // Note that the path to electron may vary according to the main file
-//   electron: require(`${__dirname}/node_modules/electron`)
-// });
+require('electron-reload')(__dirname, {
+  // Note that the path to electron may vary according to the main file
+  electron: require(`${__dirname}/node_modules/electron`)
+});
 /* ------------ END HOTLOADING -------------------- */
 
 
-// const contextMenu = require('electron-context-menu');
-// contextMenu({
-//   prepend: (defaultActions, params, browserWindow) => [
-//     {
-//       label: 'Rainbow',
-//       // Only show it when right-clicking images
-//       visible: params.mediaType === 'image'
-//     },
-//     {
-//       label: 'Search Google for “{selection}”',
-//       // Only show it when right-clicking text
-//       visible: params.selectionText.trim().length > 0,
-//       click: () => {
-//         shell.openExternal(`https://google.com/search?q=${encodeURIComponent(params.selectionText)}`);
-//       }
-//     }
-//   ]
-// });
+const contextMenu = require('electron-context-menu');
+contextMenu({
+  prepend: (defaultActions, params, browserWindow) => [
+    {
+      label: 'Rainbow',
+      // Only show it when right-clicking images
+      visible: params.mediaType === 'image'
+    },
+    {
+      label: 'Search Google for “{selection}”',
+      // Only show it when right-clicking text
+      visible: params.selectionText.trim().length > 0,
+      click: () => {
+        shell.openExternal(`https://google.com/search?q=${encodeURIComponent(params.selectionText)}`);
+      }
+    }
+  ]
+});
 
 
 
 const path = require('path')
 const ipc = require('electron').ipcMain
-const appParams = require('./src/AppParam');
-const AppDao = require('./src/dao/AppDao')
+const appDao = require('./src/dao/AppDao')
+const myLedgerMains = require('./src/bt_ledger_main')
+const tableColumnMapper = require('./src/bt-column-name-mapper')
 
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -62,7 +63,7 @@ if (gotTheLock) {
     }).catch((error) => {
       console.log(error)
     })
-
+    
   })
 } else {
   app.quit()
@@ -152,7 +153,7 @@ function createWindow (fileName) {
 
 
 function performAppLoad(myCallback){
-  AppDao.getFromDatabase("SELECT name FROM sqlite_master WHERE type='table' AND name='LedgerMaster';",[],(err,rows)=>{
+  appDao.getFromDatabase("SELECT name FROM sqlite_master WHERE type='table' AND name='LedgerMaster';",[],(err,rows)=>{
     if(err){
       console.log(err)
     }else{
@@ -166,7 +167,7 @@ function performAppLoad(myCallback){
 
 function doAfterBootstrapDB(){
   
-  AppDao.getFromDatabase("Select * from LedgerMaster",[],(err,rows)=>{
+  appDao.getFromDatabase("Select * from LedgerMaster",[],(err,rows)=>{
     var isSetUpNeeded = true;
     var userData = {}; 
     if( typeof(rows) !== "undefined" ){
@@ -191,11 +192,18 @@ function sendInitMasterData(initData,myWindow){
   myWindow.webContents.send('initData',initData);
 }
 
-
+function isEmptyObj(obj) {
+  for(var key in obj) {
+      if(obj.hasOwnProperty(key))
+      return false;
+  }
+  return true;
+}
+/*----------------------- IPC Below------------- */
 
 ipc.on('loadMasterDataOnSetup',function(event,data){
   global.sharedObj = {'userData': data}
-  AppDao.getFromDatabase("Select * from LedgerMaster",[],(err,rows)=>{
+  appDao.getFromDatabase("Select * from LedgerMaster",[],(err,rows)=>{
     if(err){
       console.log(err)
     }else{
@@ -207,13 +215,13 @@ ipc.on('loadMasterDataOnSetup',function(event,data){
       }else{
         query = "Update LedgerMaster Set master_name=?,master_address=?,master_phone=?,master_email=? where master_id ="+rows[0].master_id;
       }
-      AppDao.insertOrUpdate(query,params,(err,rows1)=>{
+      appDao.insertOrUpdate(query,params,(err,rows1)=>{
         if(err){
           console.log(err)
         }else{
           console.log(" : query done")
         }
-        AppDao.getFromDatabase("Select * from LedgerMaster",[],(err,rows2)=>{
+        appDao.getFromDatabase("Select * from LedgerMaster",[],(err,rows2)=>{
           sendInitMasterData(rows2,myWin);
         })
         
@@ -225,7 +233,7 @@ ipc.on('loadMasterDataOnSetup',function(event,data){
 ipc.on("saveProduct",(ev,data)=>{
   console.log(myLedgerMains.getInsertQuery(data))
   myLedgerMains.saveObject(data)
-
+  
 })
 ipc.on("saveBusiness",(ev,data)=>{
   console.log(myLedgerMains.getInsertQuery(data))
@@ -236,6 +244,27 @@ ipc.on("tableForRecordBox",(ev,tableName)=>{
   console.log("Table name for records: ",tableName)
   myLedgerMains.getLatestRecords(tableName,5,(err,rows)=>{
     myWin.webContents.send("dataForRecordBox",rows)
-
+    
   })
+})
+
+ipc.on("setTransactionModalData",(ev,data)=>{
+  // let filePath = path.join(__dirname,"/src/table_column_data_pop_up.html")
+  let sql ;
+  let conditionStr;
+  if (!isEmptyObj(data.condition)){
+    conditionStr = " where "
+    for (key in data.condition){
+      conditionStr += tableColumnMapper[data.table][key] +"='"+data.condition[key]+"' and "
+    }
+    conditionStr = conditionStr.substring(0, conditionStr.length - 4)+";"
+  }
+  let mainClause = "Select distinct "+ tableColumnMapper[data.table][data.column]+" from "+data.table
+  sql = (conditionStr)? mainClause + conditionStr : mainClause
+  console.log(sql)
+  appDao.getFromDatabase(sql,[],(err,rows)=>{
+    if(err){console.log(err)}
+    else{myWin.webContents.send("onDataForTransactionModal",rows)}
+  })
+  
 })

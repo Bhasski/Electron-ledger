@@ -1,3 +1,4 @@
+
 <ul class="nav nav-tabs">
     <li class="active"><a data-toggle="tab" href="#business">Business</a></li>
     <li><a data-toggle="tab" href="#profile">Daily</a></li>
@@ -6,64 +7,41 @@
 <p></p><br>
 
 <div class="tab-content" id="myTabContent">
+
     <div class="tab-pane fade in active" id="business" role="tabpanel" aria-labelledby="home-tab">
-        <form>
-            <div class="form-row">
-                <div class="form-group col-sm-4">
-                    <label >Product</label>
-                    <select class="form-control" id="product-select-1">
-                        <option>Hello</option>
-                        <option>Tata</option>
-                        <option>Hey</option>
-                        <option>Adios</option>
-                    </select>
-                </div>
-                <div class="form-group col-sm-3">
-                    <label >Quanity</label>
-                    <input type="text" class="form-control" id="" placeholder="Quanity">
-                </div>
-                <div class="form-group col-sm-2">
-                    <label >Unit</label>
-                    <select class="form-control" id="product-select-2">
-                        <option>Hello</option>
-                        <option>Tata</option>
-                        <option>Hey</option>
-                        <option>Adios</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group col-sm-3">
-                <label >Date</label>
-                <input type="text" class="form-control" id="inputCity" placeholder="MM-DD-YYYY">
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group col-sm-4">
-                    <label for="inputAddress">Business Party</label>
-                    <select class="form-control" id="product-select-3">
-                        <option>Hello</option>
-                        <option>Tata</option>
-                        <option>Hey</option>
-                        <option>Adios</option>
-                    </select>
-                </div>    
-                <div class="form-group col-sm-3">
-                    <label >Type</label>
-                    <select id="inputState" class="form-control">
-                        <option selected>Credit</option>
-                        <option>Debit</option>
-                    </select>
-                </div>
-                <div class="form-group col-sm-5">
-                    <label for="inputZip">Amount</label>
-                    <input type="text" class="form-control" id="inputZip">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="col-md-6 offset-sm-6"></div>
-                <button type="submit" class="btn btn-primary">Sign in</button>
-            </div>
-        </form>
+        <table class="table table-bordered table-condensed" id="business-transaction-table">
+            <thead>
+                <th class="col-sm-2">Product</th>
+                <th class="col-sm-2">Manufacturer</th>
+                <th class="col-sm-1">Variety</th>
+                <th class="col-sm-1">Qty</th>
+                <th class="col-sm-1">Unit</th>
+                <th class="col-sm-1">Type</th >
+                <th class="col-sm-1">Amount</th>
+                <th class="col-sm-2">Amount Billed</th>
+                <th class="col-sm-1">#</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td tabIndex="0"   get-data="Product-name">h1</td>
+                    <td tabIndex="0"   get-data="Product-manufacturer">h2</td>
+                    <td tabIndex="0"   get-data="Product-variety">h3</td>
+                    <td tabIndex="0" contenteditable="true" >h4</td>
+                    <td>
+                        <select name="" id="prod_qty" >
+                            <option value="">value-1</option>
+                            <option value="">value-2</option>
+                            <option value="">value-3</option>
+                            <option value="">value-4</option>
+                        </select>
+                    </td>
+                    <td tabIndex="0" id="test-td" contenteditable="true" >h6</td>
+                    <td tabIndex="0" contenteditable="true" >h7</td>
+                    <td tabIndex="0" contenteditable="true" >h8</td>
+                    <td tabIndex="0" >h9</td>
+                </tr>
+            </tbody>
+        </table>    
     </div>
     
     
@@ -74,4 +52,12 @@
     <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">Hello Contact</div>
 </div>
 
-    
+    <!-- Below content -->
+<div class="row bt-below-content-wrapper">
+    <p class="page-header bt-sub-header" style="text-align: center;"><b>Records</b></p>
+    <div class="col-sm-12" id="bt-below-content">
+        
+    </div>
+</div>
+<!-- Modal on Columns -->
+<div id="bt-modal-on-table-column"></div>

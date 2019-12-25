@@ -1,10 +1,20 @@
 var db_struct = {
+    LedgerMaster:{
+        id:'master_id',
+        name:'master_name',
+        proprietor:'master_proprietor',
+        address:'master_address',
+        email:'master_email',
+        phone:'master_phone'
+
+    },
     Product:{
         id:'p_id',
         name:'p_name',
         dom:'p_dom',
         doe:'p_doe',
-        manufacturer:'p_manufacturer'
+        manufacturer:'p_manufacturer',
+        variety:'p_variety'
     },
     Business:{
         id:'b_id',

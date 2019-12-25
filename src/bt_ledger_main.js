@@ -61,7 +61,7 @@ var MYLIBRARY = MYLIBRARY || (function(){
                 let sql = "Select * from "+tableName +" Order By "+definedId+" Desc "
                 sql+= (limit)?" limit "+limit+";":";"
                 // console.log("Query: ",sql)
-                console.log("colum id to get: ",definedId)
+                console.log("ledger_mains<getlatesrecords> colum id to get: ",definedId)
                 appDao.getFromDatabase(sql,[],(err,rows)=>{
                     if(err){console.log(err)}else{
                         myCallback(err,rows)  
