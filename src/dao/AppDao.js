@@ -1,5 +1,6 @@
 
 var AppDAO  = {
+
     getDaoParams: function(){
         var appParam = require('../AppParam');
         var options = {
@@ -18,7 +19,7 @@ var AppDAO  = {
         })
         return knex;
     },
-    getDB: function(){
+    _getDB: function(){
         var clientModule = this.getDaoParams().clientModule;
         var db = new clientModule.Database(this.getDaoParams().dbPath, (err) => {
             if (err) {
@@ -31,24 +32,28 @@ var AppDAO  = {
     },
     
     insertOrUpdate: function(sql, params = [],myCallback) {
-        var db = this.getDB();
+        var db = this._getDB();
         db.serialize(function(){
             db.run(sql, params, function(err) {
-                if(err)console.log(err)
-                console.log("A row has been inserted with rowid ${this.lastID}");
+                let noticationOptions = {}
+                if(err){
+                    noticationOptions = {title:"Database Error",body:err}
+                }else{
+                    noticationOptions ={title:"Success ",body:"DONE: saved."}
+                }
                 db.close();
-                if (myCallback) myCallback(err);
+                if (myCallback) myCallback(err,noticationOptions);
             })
         })
     },
     getFromDatabase: function(sql, params = [],myCallback) {
-        var db = this.getDB();
+        var db = this._getDB();
         // var allRecs = []
         db.serialize(function(){
             db.all(sql, params, function (err,rows) {
                 if(err)console.log(err)
-                if(myCallback) myCallback(err,rows)
                 db.close()
+                if(myCallback) myCallback(err,rows)
             })
         })
     },
@@ -71,7 +76,7 @@ var AppDAO  = {
     },
     
     runMultiQuery: async function(queryArr,start){
-        var db = await this.getDB();
+        var db = await this._getDB();
         for (var i= start; i < queryArr.length ;i++){
             if(queryArr[i].match(/(INSERT|CREATE|DROP|PRAGMA|BEGIN|COMMIT)/)) {
                 db.serialize(function(){

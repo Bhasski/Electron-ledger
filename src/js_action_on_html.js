@@ -23,6 +23,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
             data.dom = document.getElementById("product-add-dom").value;
             data.doe = document.getElementById("product-add-doe").value;
             data.manufacturer = document.getElementById("product-add-manufacturer").value;
+            data.variety = document.getElementById("product-add-variety").value;
             ipc.send('saveProduct',data);
             
         }// if
@@ -95,6 +96,116 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
     }
     
     
+    let tdModalCondtionToFetchData = {}//global
+    
+    function actionOnTableModalKeyUp(e){
+        if(e.keyCode == '40'){
+            if(e.target.className == "table-modal-content"){
+                if (e.target.nextElementSibling) e.target.nextElementSibling.focus()
+            }
+        }//down arrow
+        if(e.keyCode == '38'){
+            if(e.target.className == "table-modal-content" ){
+                if (e.target.previousElementSibling) e.target.previousElementSibling.focus()
+            }
+        }//up arrow
+        if(e.key=="Tab" || e.keyCode == '9'){
+            actionOnTransactionModals(e)
+        }//key COde TAB
+        
+        if(e.key=="Enter" || e.keyCode == '13'){
+            // console.log(e.target.className)
+            sendTableModalDataToParent(e)
+            
+        }// key code ENTER
+    }
+    
+    function actionOnTransactionModals(e){
+        let that = e.currentTarget;
+        if(e.target.nodeName =="TD" && e.target.getAttribute("get-data")){
+            let currTabIndex = e.target.getAttribute("tabIndex")
+            let tabIndexForModal = parseInt(currTabIndex)+1
+            let tabIndexForSiblings = parseInt(currTabIndex)+3
+            
+            // pretext for data
+            let colAttr = e.target.getAttribute("get-data")
+            let table  = colAttr.split("-")[0]
+            let tableColumnToFetch = colAttr.split("-")[1]
+            var offset =  _offset(e.target)
+            let targetWidth = e.target.offsetWidth
+            let nextAllSiblings = $(e.target).nextAll()
+            nextAllSiblings.attr("tabIndex",tabIndexForSiblings)// IMPORTANT! changing tabIndex for comings TDs
+            nextAllSiblings.each((ev,item)=>{
+                // console.log($(item).find("select,input").length)
+                if($(item).find("select,input,button").length >0){
+                    $(item).attr("tabIndex","-1")
+                    $(item).find("select,input,button").attr("tabIndex",parseInt(tabIndexForSiblings))
+                }
+            })
+            
+            if(!e.target.isSameNode(e.target.parentNode.firstElementChild)){
+                
+                if(that.querySelector("td.active-modal")){ //previous active modal if there
+                    let prevModalColumn = that.querySelector("td.active-modal");
+                    let prvColAttr = prevModalColumn.getAttribute("get-data")
+                    let isPrevElDataSet = that.querySelector("td.active-modal").getAttribute("data-set")
+                    if(isPrevElDataSet =="true"){
+                        tdModalCondtionToFetchData[prvColAttr.split("-")[1]] = prevModalColumn.innerHTML 
+                    }
+                }
+            }else{  // check for first child,to clear conditions
+                tdModalCondtionToFetchData = {}
+            }
+            // remove the class now
+            if(that.querySelector("td.active-modal")){
+                that.querySelector("td.active-modal").classList.remove("active-modal")
+            }
+            let data = {table:table,column:tableColumnToFetch,condition:tdModalCondtionToFetchData}
+            
+            let modalOptions = {
+                offset:offset,
+                width:targetWidth,
+                tabIndex:tabIndexForModal
+            }
+            
+            
+            e.target.classList.add("active-modal")
+            ipc.send("setTransactionModalData",data)
+            showTableColumnModal(modalOptions,targetWidth)
+            
+        }// td with data
+        
+        
+    }
+    
+    function sendTableModalDataToParent(e){
+        if(e.target.className == "table-modal-content" || e.target.parentNode.className =="table-modal-content"){
+            let parentTableCol = document.querySelector("td.active-modal")
+            parentTableCol.innerHTML = e.target.innerText
+            if (e.target.className == "table-modal-content") e.target.parentNode.style.display = "none"
+            if (e.target.parentNode.className =="table-modal-content") e.target.parentNode.parentNode.style.display = "none"
+            parentTableCol.setAttribute("data-set","true")
+            parentTableCol.nextElementSibling.focus()
+        }
+    }
+    
+    function showTableColumnModal(modalOptions){
+        var modalEl = document.getElementById("bt-modal-on-table-column")
+        modalEl.style.top = (modalOptions.offset.top+35)+"px"
+        modalEl.style.left = (modalOptions.offset.left)+"px"
+        modalEl.style.width = (modalOptions.width+20)+"px"
+        setTimeout(() => {
+            Array.from(modalEl.querySelectorAll(".table-modal-content")).forEach((node)=>{
+                // console.log(node)
+                if(node)node.setAttribute("tabIndex",modalOptions.tabIndex)
+            })
+        }, 15);
+        modalEl.style.display = "block"
+    }
+    
+    
+    
+    
     
     function _hideActiveTab(){
         let activeTabEl = document.querySelector(".nav-tabs li.active")
@@ -123,7 +234,12 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
         if(tab_paneEl) tab_paneEl.classList.add("active")    
         if(tab_paneEl) tab_paneEl.classList.add("in")    
     }
-    
+    function _offset(el) {
+        var rect = el.getBoundingClientRect(),
+        scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
+        scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        return { top: rect.top + scrollTop, left: rect.left + scrollLeft }
+    }
     
     function tabBtnAndContentActiveState(selectorTab,selectorPane){
         _makeTabActiveWithoutContent(selectorTab);
@@ -142,9 +258,12 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
         doActionOnSetUpContent:function(event,isSetUpNeeded){
             doActionsOnSetUpConent(event,isSetUpNeeded);
         },
-        hideActiveTabPane:hideActiveTabPane,
-        makeTabActive:tabBtnAndContentActiveState,
-        sendTableForRecordBox:sendTableForRecordBox
+        hideActiveTabPane: hideActiveTabPane,
+        makeTabActive: tabBtnAndContentActiveState,
+        sendTableForRecordBox: sendTableForRecordBox,
+        actionOnTableModalKeyUp: actionOnTableModalKeyUp,
+        actionOnTransactionModals: actionOnTransactionModals,
+        sendTableModalDataToParent: sendTableModalDataToParent
         
     }
 })();

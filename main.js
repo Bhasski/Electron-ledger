@@ -1,5 +1,5 @@
 
-const {BrowserWindow, app, Menu, screen} =  require('electron');
+const {BrowserWindow, app, Menu, screen,Notification} =  require('electron');
 const session = require('electron').session
 
 
@@ -192,13 +192,6 @@ function sendInitMasterData(initData,myWindow){
   myWindow.webContents.send('initData',initData);
 }
 
-function isEmptyObj(obj) {
-  for(var key in obj) {
-      if(obj.hasOwnProperty(key))
-      return false;
-  }
-  return true;
-}
 /*----------------------- IPC Below------------- */
 
 ipc.on('loadMasterDataOnSetup',function(event,data){
@@ -230,13 +223,22 @@ ipc.on('loadMasterDataOnSetup',function(event,data){
   })
 })// ipc
 
+
+ipc.on("CATCH_NOTIFICATION",(ev,options)=>{
+  let n = new Notification(options)
+  n.show()
+})
+
 ipc.on("saveProduct",(ev,data)=>{
-  console.log(myLedgerMains.getInsertQuery(data))
-  myLedgerMains.saveObject(data)
+  console.log("data sent :", data)
+  myLedgerMains.saveObject(data,(err,notOptions)=>{
+    new Notification(notOptions).show()
+  })
   
 })
 ipc.on("saveBusiness",(ev,data)=>{
-  console.log(myLedgerMains.getInsertQuery(data))
+  console.log("data sent :", data)
+  
   myLedgerMains.saveObject(data)
 })
 
@@ -244,27 +246,14 @@ ipc.on("tableForRecordBox",(ev,tableName)=>{
   console.log("Table name for records: ",tableName)
   myLedgerMains.getLatestRecords(tableName,5,(err,rows)=>{
     myWin.webContents.send("dataForRecordBox",rows)
-    
   })
 })
 
 ipc.on("setTransactionModalData",(ev,data)=>{
   // let filePath = path.join(__dirname,"/src/table_column_data_pop_up.html")
-  let sql ;
-  let conditionStr;
-  if (!isEmptyObj(data.condition)){
-    conditionStr = " where "
-    for (key in data.condition){
-      conditionStr += tableColumnMapper[data.table][key] +"='"+data.condition[key]+"' and "
-    }
-    conditionStr = conditionStr.substring(0, conditionStr.length - 4)+";"
-  }
-  let mainClause = "Select distinct "+ tableColumnMapper[data.table][data.column]+" from "+data.table
-  sql = (conditionStr)? mainClause + conditionStr : mainClause
-  console.log(sql)
-  appDao.getFromDatabase(sql,[],(err,rows)=>{
-    if(err){console.log(err)}
-    else{myWin.webContents.send("onDataForTransactionModal",rows)}
+  myLedgerMains.setTransactionTableModalData(data,(err,rows)=>{
+    myWin.webContents.send("onDataForTransactionModal",rows)
   })
-  
 })
+
+

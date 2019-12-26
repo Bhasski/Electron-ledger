@@ -21,7 +21,9 @@ CREATE TABLE  IF NOT EXISTS Product (
     p_name TEXT  NOT NULL,
     p_dom  TEXT ,
     p_doe TEXT NOT NULL,
-    p_manufacturer TEXT 
+    p_variety TEXT,
+    p_manufacturer TEXT,
+    UNIQUE(p_name,p_manufacturer,p_variety) 
 );
 CREATE TABLE IF NOT EXISTS Business_Product_Rel(
     b_id INTEGER,

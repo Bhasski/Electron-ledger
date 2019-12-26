@@ -26,19 +26,28 @@
                     <td tabIndex="0"   get-data="Product-name">h1</td>
                     <td tabIndex="0"   get-data="Product-manufacturer">h2</td>
                     <td tabIndex="0"   get-data="Product-variety">h3</td>
-                    <td tabIndex="0" contenteditable="true" >h4</td>
+                    <td tabIndex="0" contenteditable="true" data-text="Quantity"></td>
                     <td>
                         <select name="" id="prod_qty" >
-                            <option value="">value-1</option>
-                            <option value="">value-2</option>
-                            <option value="">value-3</option>
-                            <option value="">value-4</option>
+                            <option value="unit">unit</option>
+                            <option value="gm">gram</option>
+                            <option value="kg">kilogram</option>
+                            <option value="bag">Bag(s)</option>
+                            <option value="pack">Pack</option>
+                            <option value="ctn">Cartoon</option>
                         </select>
                     </td>
-                    <td tabIndex="0" id="test-td" contenteditable="true" >h6</td>
-                    <td tabIndex="0" contenteditable="true" >h7</td>
-                    <td tabIndex="0" contenteditable="true" >h8</td>
-                    <td tabIndex="0" >h9</td>
+                    <td tabIndex="0" id="test-td"  >
+                        <select name="" id="prod_type" >
+                            <option value="">CREDIT</option>
+                            <option value="">DEBIT</option>
+                        </select>
+                    </td>
+                    <td tabIndex="0" contenteditable="true" data-text="Quoted Amount" ></td>
+                    <td tabIndex="0" contenteditable="true" data-text="Enter Amount"></td>
+                    <td tabIndex="0" >
+                        <button><span class="glyphicon glyphicon-plus"></span></button>
+                    </td>
                 </tr>
             </tbody>
         </table>    

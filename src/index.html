@@ -90,8 +90,8 @@
         display: flex;
         flex-flow: column;
     }
- 
-
+    
+    
     #bt-add-content-box{
         padding: 10px 10px;
     }
@@ -115,9 +115,9 @@
     }
     .bt-tab-pane-top-btn-box{
         padding: 10px 0px;
-        text-align: right;
+        text-align: center;
     }
-
+    
     #bt-modal-on-table-column{
         width: 200px;
         height: 250px;
@@ -136,14 +136,17 @@
         word-wrap: break-word;
     }
     .table-modal-content:hover{
-        background-color:white;
+        background-color:#444;
+        color: white;
     }
     .table-modal-content:focus{
         background-color:#444;
         color: white;
     }
+    .table-modal-content{
+        cursor: default;
+    }
     
-
     th {
         background-color:#547a9b;
         color: white;
@@ -151,7 +154,11 @@
     td{
         padding: 0px 0px 5px 5px;
     }
-
+    
+    td[contentEditable=true]:empty:not(:focus):before{
+        content:attr(data-text);
+        color:#999;
+    }
     /* modified bootstrap */
     .navbar{
         border-radius: unset;
@@ -179,7 +186,7 @@
     .nav-tabs>li>a {
         padding: 10px 35px;
     }
-     
+    
     /* .tab-content .tab-pane{
         display: none;
     } */
@@ -250,10 +257,10 @@
                             </div>
                         </div>
                     </div>
-
+                    
                     <!-- <div class="col-sm-12"></div> --> <!-- if footer needed -->
                 </div>
-
+                
             </div> 
             
             

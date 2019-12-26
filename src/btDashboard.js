@@ -152,123 +152,11 @@ function getWindowBounds(remote){
         
         /* Tabinf html  magic  on table */
         
-        document.getElementById("bt-add-content-box").addEventListener("focusin",actionOnTransactionModals)// focusin
+        document.getElementById("bt-add-content-box").addEventListener("focusin",my_html_magic_lib.actionOnTransactionModals)// focusin
 
-        document.getElementById("bt-add-content-box").addEventListener("keyup",actionOnTableModalKeyUp)//key up
+        document.getElementById("bt-add-content-box").addEventListener("keyup",my_html_magic_lib.actionOnTableModalKeyUp)//key up
         
-        document.getElementById("bt-add-content-box").addEventListener("mousedown",sendTableModalDataToParent)//key up
-        
-        
-        
-        let tdModalCondtionToFetchData = {}//global
-        
-        
-        function actionOnTableModalKeyUp(e){
-            
-            if(e.key=="Tab" || e.keyCode == '9'){
-                actionOnTransactionModals(e)
-            }//key COde TAB
-            
-            if(e.key=="Enter" || e.keyCode == '13'){
-                // console.log(e.target.className)
-                sendTableModalDataToParent(e)
-                
-            }// key code ENTER
-        }
-        
-        function actionOnTransactionModals(e){
-            let that = e.currentTarget;
-            if(e.target.nodeName =="TD" && e.target.getAttribute("get-data")){
-                let currTabIndex = e.target.getAttribute("tabIndex")
-                let tabIndexForModal = parseInt(currTabIndex)+1
-                let tabIndexForSiblings = parseInt(currTabIndex)+2
-                
-                // pretext for data
-                let colAttr = e.target.getAttribute("get-data")
-                let table  = colAttr.split("-")[0]
-                let tableColumnToFetch = colAttr.split("-")[1]
-                var offset =  _offset(e.target)
-                let targetWidth = e.target.offsetWidth
-                
-                $(e.target).nextAll().attr("tabIndex",tabIndexForSiblings)// IMPORTANT! changing tabIndex for comings TDs
-                
-                if(!e.target.isSameNode(e.target.parentNode.firstElementChild)){
-
-                    if(that.querySelector("td.active-modal")){ //previous active modal if there
-                        let prevModalColumn = that.querySelector("td.active-modal");
-                        let prvColAttr = prevModalColumn.getAttribute("get-data")
-                        let isPrevElDataSet = that.querySelector("td.active-modal").getAttribute("data-set")
-                        if(isPrevElDataSet =="true"){
-                            tdModalCondtionToFetchData[prvColAttr.split("-")[1]] = prevModalColumn.querySelector("b").innerHTML 
-                        }
-                    }
-                }else{  // check for first child,to clear conditions
-                    tdModalCondtionToFetchData = {}
-                }
-                // remove the class now
-                if(that.querySelector("td.active-modal")){
-                    that.querySelector("td.active-modal").classList.remove("active-modal")
-                }
-                let data = {table:table,column:tableColumnToFetch,condition:tdModalCondtionToFetchData}
-                
-                let modalOptions = {
-                    offset:offset,
-                    width:targetWidth,
-                    tabIndex:tabIndexForModal
-                }
-                
-                
-                e.target.classList.add("active-modal")
-                ipc.send("setTransactionModalData",data)
-                showTableColumnModal(modalOptions,targetWidth)
-                
-            }// td with data
-        
-        
-        }
-
-        function sendTableModalDataToParent(e){
-            if(e.target.className == "table-modal-content"){
-                let parent = document.querySelector("td.active-modal")
-                parent.innerHTML = e.target.innerHTML
-                e.target.parentNode.style.display = "none"
-                parent.setAttribute("data-set","true")
-                parent.nextElementSibling.focus()
-            }
-        }
-
-        function showTableColumnModal(modalOptions){
-            var modalEl = document.getElementById("bt-modal-on-table-column")
-            modalEl.style.top = (modalOptions.offset.top+30)+"px"
-            modalEl.style.left = (modalOptions.offset.left-10)+"px"
-            modalEl.style.width = (modalOptions.width+15)+"px"
-            setTimeout(() => {
-                Array.from(modalEl.querySelectorAll(".table-modal-content")).forEach((node)=>{
-                    // console.log(node)
-                    if(node)node.setAttribute("tabIndex",modalOptions.tabIndex)
-                })
-            }, 15);
-            modalEl.style.display = "block"
-        }
-
-        function _getAllOtherSiblingsOfNode(elem){
-            let allOtherSiblings = [],
-            node = elem.parentNode.firstChild;
-            
-            while ( node ) {
-                if ( node !== elem && node.nodeType === Node.ELEMENT_NODE ) 
-                allOtherSiblings.push( node );
-                node = node.nextElementSibling || node.nextSibling;
-            }
-            return allOtherSiblings;
-        }
-        
-        function _offset(el) {
-            var rect = el.getBoundingClientRect(),
-            scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
-            scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            return { top: rect.top + scrollTop, left: rect.left + scrollLeft }
-        }
+        document.getElementById("bt-add-content-box").addEventListener("mousedown",my_html_magic_lib.sendTableModalDataToParent)//key up
         
         
         
@@ -283,23 +171,25 @@ function getWindowBounds(remote){
         })
         
         ipc.on("dataForRecordBox",(ev,data)=>{
-            // console.log(data)
-            let recordEl = document.getElementById("bt-below-content")
-            let tHeadStr;
-            let tBodyStr = "<tbody>"
-            for (row of data){
-                tHeadStr = "<thead>"
-                tBodyStr += "<tr>"
-                for (key in row){
-                    tHeadStr += "<th>"+key+"</th>"
-                    tBodyStr += (key.includes("name"))? "<td><b>"+row[key]+"</b></td>":(row[key] == null)? "<td>"+" NA "+"</td>":"<td>"+row[key]+"</td>"
+            if(!isEmptyObj(data)){
+                let recordEl = document.getElementById("bt-below-content")
+                let tHeadStr;
+                let tBodyStr = "<tbody>"
+                for (row of data){
+                    tHeadStr = "<thead>"
+                    tBodyStr += "<tr>"
+                    for (key in row){
+                        tHeadStr += "<th>"+key+"</th>"
+                        tBodyStr += (key.includes("name"))? "<td><b>"+row[key]+"</b></td>":(row[key] == null)? "<td>"+" NA "+"</td>":"<td>"+row[key]+"</td>"
+                    }
+                    tBodyStr += "<td><a><span class=\"glyphicon glyphicon-edit\"></span></td></a></tr>"
                 }
-                tBodyStr += "<td><a><span class=\"glyphicon glyphicon-edit\"></span></td></a></tr>"
-            }
-            tHeadStr += "<th>Action</th></thead>"
-            tBodyStr += "</tbody>"
-            let htmlStr = "<table class=\"table table-bordered table-condensed table-hover table-striped\">"+tHeadStr+tBodyStr+"</table>"
-            recordEl.innerHTML = htmlStr;
+                tHeadStr += "<th>Action</th></thead>"
+                tBodyStr += "</tbody>"
+                let htmlStr = "<table class=\"table table-bordered table-condensed table-hover table-striped\">"+tHeadStr+tBodyStr+"</table>"
+                setTimeout(()=>{recordEl.innerHTML = htmlStr;},10)// let record box be there
+                
+            }// if not empty
         }) //ipc for record Box
         
         ipc.on("onDataForTransactionModal",(ev,data)=>{
