@@ -251,8 +251,9 @@ ipc.on("tableForRecordBox",(ev,tableName)=>{
 
 ipc.on("setTransactionModalData",(ev,data)=>{
   // let filePath = path.join(__dirname,"/src/table_column_data_pop_up.html")
-  myLedgerMains.setTransactionTableModalData(data,(err,rows)=>{
-    myWin.webContents.send("onDataForTransactionModal",rows)
+  myLedgerMains.setTransactionTableModalData(data,(err,rows,data)=>{
+    data["rows"] = rows;
+    myWin.webContents.send("onDataForTransactionModal",data)
   })
 })
 

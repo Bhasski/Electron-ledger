@@ -44,20 +44,34 @@
         font-size: 14px;
         text-align: center;
         word-wrap: break-word;
-        color: rgb(219, 216, 216);
+        color: rgb(207, 206, 206);
         
     }
     
     .bt-sidebar-nav li a:hover{
         background-color: rgb(138, 139, 156)!important;
         color: whitesmoke;
+        border: solid 2px rgb(133, 119, 119);
+    }
+    .bt-sidebar-nav li a:focus{
+        background-color: rgb(138, 139, 156)!important;
+        color: whitesmoke;
     }
     .bt-sidebar-nav li.active a{
         background-color: rgb(99, 101, 122);
-        color:rgb(219, 216, 216);
+        color:whitesmoke;
         -webkit-box-shadow: inset -25px -20px 30px -15px  rgba(51,51,56,1);
         -moz-box-shadow: inset -25px -20px 30px -15px  rgba(51,51,56,1);
         box-shadow: inset -25px -20px 30px -15px  rgba(51,51,56,1);
+    }
+    .bt-sidebar-nav li.active a:hover,.bt-sidebar-nav li.active a:focus{
+        color: whitesmoke;
+    }
+    .bt-sidebar-nav li:last-child{
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
     }
     
     .bt-sub-header{
@@ -117,7 +131,13 @@
         padding: 10px 0px;
         text-align: center;
     }
-    
+
+    #bt-transaction-top-param-box>div{
+        border: solid 1px #dedede;
+        padding: 10px;
+        margin:0px 75px
+    }
+
     #bt-modal-on-table-column{
         width: 200px;
         height: 250px;
@@ -125,9 +145,8 @@
         z-index: 1000;
         display: none;
         position: fixed;
-        opacity: 0.6;
-        /* overflow-x: auto;
-        overflow-y: auto; */
+        opacity: 0.8;
+        overflow-y: auto;
         
     }
     .table-modal-content{

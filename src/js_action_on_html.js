@@ -96,8 +96,6 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
     }
     
     
-    let tdModalCondtionToFetchData = {}//global
-    
     function actionOnTableModalKeyUp(e){
         if(e.keyCode == '40'){
             if(e.target.className == "table-modal-content"){
@@ -110,19 +108,20 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
             }
         }//up arrow
         if(e.key=="Tab" || e.keyCode == '9'){
-            actionOnTransactionModals(e)
+            tabActionAndTransactionModalsData(e)
         }//key COde TAB
         
         if(e.key=="Enter" || e.keyCode == '13'){
-            // console.log(e.target.className)
             sendTableModalDataToParent(e)
             
         }// key code ENTER
     }
     
-    function actionOnTransactionModals(e){
+    let tdModalCondtionToFetchData = {}//global
+    
+    function tabActionAndTransactionModalsData(e){
         let that = e.currentTarget;
-        if(e.target.nodeName =="TD" && e.target.getAttribute("get-data")){
+        if((e.target.nodeName =="TD" || e.target.id =="business-name") && (  e.target.getAttribute("get-data")) ){
             let currTabIndex = e.target.getAttribute("tabIndex")
             let tabIndexForModal = parseInt(currTabIndex)+1
             let tabIndexForSiblings = parseInt(currTabIndex)+3
@@ -133,15 +132,24 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
             let tableColumnToFetch = colAttr.split("-")[1]
             var offset =  _offset(e.target)
             let targetWidth = e.target.offsetWidth
-            let nextAllSiblings = $(e.target).nextAll()
-            nextAllSiblings.attr("tabIndex",tabIndexForSiblings)// IMPORTANT! changing tabIndex for comings TDs
-            nextAllSiblings.each((ev,item)=>{
-                // console.log($(item).find("select,input").length)
-                if($(item).find("select,input,button").length >0){
-                    $(item).attr("tabIndex","-1")
-                    $(item).find("select,input,button").attr("tabIndex",parseInt(tabIndexForSiblings))
-                }
-            })
+            if(e.target.id =="business-name"){
+                e.target.parentNode.parentNode.nextElementSibling.querySelector('select').setAttribute("tabIndex",tabIndexForSiblings)
+                let tableCols = e.currentTarget.querySelector("#business-transaction-table").querySelectorAll("TD,select,button")
+                tableCols.forEach((td)=>{
+                    td.setAttribute("tabIndex",tabIndexForSiblings)
+                })
+            }
+            if(e.target.nodeName =='TD'){
+                let nextAllSiblings = $(e.target).nextAll()
+                nextAllSiblings.attr("tabIndex",tabIndexForSiblings)// IMPORTANT! changing tabIndex for comings TDs
+                nextAllSiblings.each((ev,item)=>{
+                    // console.log(nextAllSiblings)
+                    if($(item).find("select,input,button").length >0){
+                        $(item).attr("tabIndex","-1")   
+                        $(item).find("select,input,button").attr("tabIndex",parseInt(tabIndexForSiblings))
+                    }
+                })
+            }
             
             if(!e.target.isSameNode(e.target.parentNode.firstElementChild)){
                 
@@ -154,52 +162,61 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
                     }
                 }
             }else{  // check for first child,to clear conditions
+                console.log("first child")
                 tdModalCondtionToFetchData = {}
             }
             // remove the class now
-            if(that.querySelector("td.active-modal")){
-                that.querySelector("td.active-modal").classList.remove("active-modal")
+            if(that.querySelector(".active-modal")){
+                that.querySelector(".active-modal").classList.remove("active-modal")
             }
-            let data = {table:table,column:tableColumnToFetch,condition:tdModalCondtionToFetchData}
+            
+            let data = {
+                table:table,
+                column:tableColumnToFetch,
+                condition:tdModalCondtionToFetchData,
+                tabIndex:tabIndexForModal
+            }
             
             let modalOptions = {
                 offset:offset,
                 width:targetWidth,
-                tabIndex:tabIndexForModal
             }
+            // tabIndex:tabIndexForModal
             
             
             e.target.classList.add("active-modal")
             ipc.send("setTransactionModalData",data)
-            showTableColumnModal(modalOptions,targetWidth)
             
-        }// td with data
+            setTimeout(() => {
+                showTableColumnModal(modalOptions,targetWidth)
+            }, 15); 
+            
+        } // get-data attribute
         
         
     }
     
     function sendTableModalDataToParent(e){
         if(e.target.className == "table-modal-content" || e.target.parentNode.className =="table-modal-content"){
-            let parentTableCol = document.querySelector("td.active-modal")
-            parentTableCol.innerHTML = e.target.innerText
+            let parentToModal = document.querySelector(".active-modal")
+            if(parentToModal.tagName =='INPUT'){
+                parentToModal.value = e.target.innerText
+            }else{
+                parentToModal.innerHTML = e.target.innerText
+                parentToModal.setAttribute("data-set","true")
+                parentToModal.nextElementSibling.focus()
+            }
+            // parentToModal.classList.remove("active-modal")
             if (e.target.className == "table-modal-content") e.target.parentNode.style.display = "none"
             if (e.target.parentNode.className =="table-modal-content") e.target.parentNode.parentNode.style.display = "none"
-            parentTableCol.setAttribute("data-set","true")
-            parentTableCol.nextElementSibling.focus()
         }
     }
     
     function showTableColumnModal(modalOptions){
         var modalEl = document.getElementById("bt-modal-on-table-column")
-        modalEl.style.top = (modalOptions.offset.top+35)+"px"
+        modalEl.style.top = (modalOptions.offset.bottom+5)+"px"
         modalEl.style.left = (modalOptions.offset.left)+"px"
         modalEl.style.width = (modalOptions.width+20)+"px"
-        setTimeout(() => {
-            Array.from(modalEl.querySelectorAll(".table-modal-content")).forEach((node)=>{
-                // console.log(node)
-                if(node)node.setAttribute("tabIndex",modalOptions.tabIndex)
-            })
-        }, 15);
         modalEl.style.display = "block"
     }
     
@@ -238,7 +255,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
         var rect = el.getBoundingClientRect(),
         scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
         scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        return { top: rect.top + scrollTop, left: rect.left + scrollLeft }
+        return { bottom: rect.bottom + scrollTop, left: rect.left + scrollLeft }
     }
     
     function tabBtnAndContentActiveState(selectorTab,selectorPane){
@@ -262,7 +279,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
         makeTabActive: tabBtnAndContentActiveState,
         sendTableForRecordBox: sendTableForRecordBox,
         actionOnTableModalKeyUp: actionOnTableModalKeyUp,
-        actionOnTransactionModals: actionOnTransactionModals,
+        actionOnTransactionModals: tabActionAndTransactionModalsData,
         sendTableModalDataToParent: sendTableModalDataToParent
         
     }

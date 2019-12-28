@@ -4,11 +4,32 @@
     <li><a data-toggle="tab" href="#profile">Daily</a></li>
     <li><a data-toggle="tab" href="#contact">Search</a></li>
 </ul>
-<p></p><br>
+<p></p>
 
 <div class="tab-content" id="myTabContent">
-
     <div class="tab-pane fade in active" id="business" role="tabpanel" aria-labelledby="home-tab">
+        
+        <div id="bt-transaction-top-param-box" style="padding: 10px;margin-bottom: 10px;">
+            <div class="row form-horizontal bt-form">
+                <div class="col-sm-7 bt-mandatory">
+                 <label class="col-sm-3 control-label" for="input">Select Business</label>
+                    <div class="col-sm-9">
+                        <input type="text" tabindex="0" id="business-name" 
+                        get-data="Business-name" class="form-control bt-select-business" readonly>
+                    </div>
+                </div>
+                <div class="col-sm-5">
+                    <label class="col-sm-5 control-label">Transaction Type</label>
+                    <div class="col-sm-7">
+                        <select class="form-control" name="" id="bt-business-type" >
+                            <option value="debit">DEBIT</option>
+                            <option value="credit">CREDIT</option>
+                        </select>
+                    </div>
+              </div>
+            </div>
+        </div>
+
         <table class="table table-bordered table-condensed" id="business-transaction-table">
             <thead>
                 <th class="col-sm-2">Product</th>
@@ -16,35 +37,27 @@
                 <th class="col-sm-1">Variety</th>
                 <th class="col-sm-1">Qty</th>
                 <th class="col-sm-1">Unit</th>
-                <th class="col-sm-1">Type</th >
-                <th class="col-sm-1">Amount</th>
+                <th class="col-sm-1">Unit Price</th>
                 <th class="col-sm-2">Amount Billed</th>
-                <th class="col-sm-1">#</th>
+                <th class="col-sm-1">Action</th>
             </thead>
             <tbody>
                 <tr>
-                    <td tabIndex="0"   get-data="Product-name">h1</td>
-                    <td tabIndex="0"   get-data="Product-manufacturer">h2</td>
-                    <td tabIndex="0"   get-data="Product-variety">h3</td>
+                    <td tabIndex="0" contenteditable="true"  get-data="Product-name"></td>
+                    <td tabIndex="0" contenteditable="true"  get-data="Product-manufacturer"></td>
+                    <td tabIndex="0" contenteditable="true"  get-data="Product-variety"></td>
                     <td tabIndex="0" contenteditable="true" data-text="Quantity"></td>
                     <td>
                         <select name="" id="prod_qty" >
-                            <option value="unit">unit</option>
-                            <option value="gm">gram</option>
-                            <option value="kg">kilogram</option>
+                            <option value="unit">unit(s)</option>
+                            <option value="gm">g(s)</option>
+                            <option value="kg">Kg(s)</option>
                             <option value="bag">Bag(s)</option>
-                            <option value="pack">Pack</option>
-                            <option value="ctn">Cartoon</option>
+                            <option value="ctn">Case</option>
                         </select>
                     </td>
-                    <td tabIndex="0" id="test-td"  >
-                        <select name="" id="prod_type" >
-                            <option value="">CREDIT</option>
-                            <option value="">DEBIT</option>
-                        </select>
-                    </td>
-                    <td tabIndex="0" contenteditable="true" data-text="Quoted Amount" ></td>
-                    <td tabIndex="0" contenteditable="true" data-text="Enter Amount"></td>
+                    <td tabIndex="0" contenteditable="true" data-text="Unit Price" ></td>
+                    <td tabIndex="0"  data-text="Amount"></td>
                     <td tabIndex="0" >
                         <button><span class="glyphicon glyphicon-plus"></span></button>
                     </td>

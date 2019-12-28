@@ -88,7 +88,7 @@ var LEDGER_MAINS = LEDGER_MAINS || (function(){
         console.log(sql)
         appDao.getFromDatabase(sql,[],(err,rows)=>{
             if(err){console.log(err)}
-            else{myCallback(err,rows)}
+            else{myCallback(err,rows,data)}
         })
                     
     }

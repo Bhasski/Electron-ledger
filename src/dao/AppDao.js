@@ -37,7 +37,8 @@ var AppDAO  = {
             db.run(sql, params, function(err) {
                 let noticationOptions = {}
                 if(err){
-                    noticationOptions = {title:"Database Error",body:err}
+                    console.log(err)
+                    noticationOptions = {title:"Database Error",body:""+err}
                 }else{
                     noticationOptions ={title:"Success ",body:"DONE: saved."}
                 }

@@ -153,12 +153,22 @@ function getWindowBounds(remote){
         /* Tabinf html  magic  on table */
         
         document.getElementById("bt-add-content-box").addEventListener("focusin",my_html_magic_lib.actionOnTransactionModals)// focusin
-
-        document.getElementById("bt-add-content-box").addEventListener("keyup",my_html_magic_lib.actionOnTableModalKeyUp)//key up
         
-        document.getElementById("bt-add-content-box").addEventListener("mousedown",my_html_magic_lib.sendTableModalDataToParent)//key up
+        document.getElementById("bt-add-content-box").addEventListener("keyup",(e)=>{
+            my_html_magic_lib.actionOnTableModalKeyUp(e)
+            //filter on data
+            if((e.target.nodeName=='TD')&& (e.target.getAttribute("get-data"))){
+                let value = $(e.target).text().toLowerCase();
+                var filterLength = $("#bt-modal-on-table-column div b").filter(function() {
+                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                }).length 
+                // console.log(filterLength) 
+            }
+        })//key up
         
-        
+        document.getElementById("bt-add-content-box").addEventListener("mousedown",(e)=>{
+            if(e.button ==0) my_html_magic_lib.sendTableModalDataToParent(e)
+        })//mouse down
         
         /*--------------------- IPC Section -----------------*/
         ipc.on("initData", function(evt,result){
@@ -196,14 +206,13 @@ function getWindowBounds(remote){
             var modalEl = document.getElementById("bt-modal-on-table-column")
             // console.log(data)
             let htmlStr =""
-            for (row of data){
+            for (row of data.rows){
                 for(key in row){
-                    htmlStr +="<div tabIndex='0' class=\"table-modal-content\"><b>"+row[key]+"</b></div>"
+                    htmlStr +="<div tabIndex=\""+data.tabIndex+"\" class=\"table-modal-content\"><b>"+row[key]+"</b></div>"
                 }
             }
             modalEl.innerHTML =htmlStr;
         })// ipc for tx table modal
-        
         
         
     })// on content load
