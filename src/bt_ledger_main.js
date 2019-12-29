@@ -36,6 +36,7 @@ var LEDGER_MAINS = LEDGER_MAINS || (function(){
         }else{
             console.log("Error: Give data object as argument !!")
         }
+        console.log("daaaata : ",data)
         console.log(query)
         return query;
     }//

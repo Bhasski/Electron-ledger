@@ -108,6 +108,7 @@
     
     #bt-add-content-box{
         padding: 10px 10px;
+        position: relative;
     }
     
     .bt-submit-row{
@@ -178,6 +179,27 @@
         content:attr(data-text);
         color:#999;
     }
+    .position-abs-center-child{
+        display: none;
+        position: fixed;
+        /* left: 30%; */
+        top:0px;
+        bottom: 0px;
+        left:0px;
+        right:0px
+    }
+    #bt-add-modal-box{
+        position: absolute;;
+        padding: 5px 30px 30px;
+        background-color: #fff;
+        z-index: 3000;
+        border-radius: 4px;
+        /* left:-20%; */
+        left:18%;
+        right:10%;
+        top:20%;
+        box-shadow:  0 0 15px rgb(153, 214, 243);
+    }
     /* modified bootstrap */
     .navbar{
         border-radius: unset;
@@ -206,9 +228,6 @@
         padding: 10px 35px;
     }
     
-    /* .tab-content .tab-pane{
-        display: none;
-    } */
 </style>
 <script>
 </script>    
@@ -276,10 +295,8 @@
                             </div>
                         </div>
                     </div>
-                    
                     <!-- <div class="col-sm-12"></div> --> <!-- if footer needed -->
                 </div>
-                
             </div> 
             
             
@@ -287,6 +304,8 @@
     </div>
     
 </div>
+
+
 
 <script>window.$ = window.jQuery = require('../assets/js/jquery.min.js')</script>
 <script src="./btDashboard.js"></script>

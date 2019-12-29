@@ -1,9 +1,13 @@
 var my_html_magic_lib = my_html_magic_lib || (function(){
     var ipc  = require('electron').ipcRenderer
     
+    function _saveObject(data,myCallback){
+        ipc.send('saveObject',data);
+        setTimeout(() => {if(myCallback) myCallback()}, 10);
+    }
     function doActionsOnSetUpConent(e,isSetUpNeeded){
         let that = e.currentTarget ;
-        if(e.target && e.target.matches("#bt-setup-form button")){// master add
+        if(e.target && e.target.matches("#bt-master-add-form button")){// master add
             e.preventDefault();
             // e.stopPropagation();
             let data = {};
@@ -12,6 +16,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
             data.phone = document.getElementById("master_phone").value;
             data.email = document.getElementById("master_email").value;
             ipc.send('loadMasterDataOnSetup',data);
+            sendTableForRecordBox("LedgerMaster")
             
         }
         if(e.target && e.target.matches("#product-add-submit")){// Product Add
@@ -24,7 +29,8 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
             data.doe = document.getElementById("product-add-doe").value;
             data.manufacturer = document.getElementById("product-add-manufacturer").value;
             data.variety = document.getElementById("product-add-variety").value;
-            ipc.send('saveProduct',data);
+            _saveObject(data,()=>{sendTableForRecordBox(data.table)})
+            
             
         }// if
         if(e.target && e.target.matches("#business-add-submit")){// Product Add
@@ -37,18 +43,18 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
             data.phone = document.getElementById("business-add-phone").value;
             data.email = document.getElementById("business-add-email").value;
             data.proprietor = document.getElementById("business-add-proprietor").value;
-            ipc.send('saveBusiness',data);
+            _saveObject(data,()=>{sendTableForRecordBox(data.table)})
             
         }// if
         
         if(e.target && e.target.matches(".nav-tabs li a")){// tab-pane top btn text and class manipulation
-            e.preventDefault();
+            // e.preventDefault();
             let actionDivEl = that.querySelector(".bt-tab-pane-top-btn-box")
             
             if(actionDivEl){
                 e.stopPropagation();// stopped for bootstrap functionality to work
                 _makeTabActiveWithoutContent(e.target)
-                hideActiveTabPane()
+                // hideActiveTabPane()
                 let href = e.target.getAttribute("href").toString().trim();
                 let spanEl = actionDivEl.querySelector("button span")
                 let spanClass = "glyphicon glyphicon-plus"
@@ -60,21 +66,21 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
                     spanEl.className = spanClass;
                     spanEl.parentNode.removeChild(prvTextNode)//remove the previous text node
                     spanEl.parentNode.appendChild(document.createTextNode(btnStr))
-                    sendTableForRecordBox("LedgerMaster") 
+                    setTimeout(() => {sendTableForRecordBox("LedgerMaster") }, 50);
                 }
                 if (href === "#add-product"){
                     btnStr = " Add Product"
                     spanEl.className = spanClass;
                     spanEl.parentNode.removeChild(prvTextNode)//remove the previous text node
                     spanEl.parentNode.appendChild(document.createTextNode(btnStr)) 
-                    sendTableForRecordBox("Product")
+                    setTimeout(() => {sendTableForRecordBox("Product") }, 50);
                 }
                 if (href === "#add-business"){
                     btnStr = " Add Business"
                     spanEl.className = spanClass;
                     spanEl.parentNode.removeChild(prvTextNode)//remove the previous text node
                     spanEl.parentNode.appendChild(document.createTextNode(btnStr)) 
-                    sendTableForRecordBox("Business")
+                    setTimeout(() => {sendTableForRecordBox("Business") }, 50);
                 }
                 
             } //if action button insside tap pane present
@@ -83,17 +89,90 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
         
         if(e.target && e.target.matches(".bt-tab-pane-top-btn-box button")){
             if(e.target.childNodes[2].nodeValue.includes("Master")){
-                _showTabPane("#bt-add-content-box .tab-content .tab-pane#add-master")
+                _showAddModal("add-master-form.html")
             }
             if(e.target.childNodes[2].nodeValue.includes("Product")){
-                _showTabPane("#bt-add-content-box .tab-content .tab-pane#add-product")
+                _showAddModal("add-product-form.html")
             }
             if(e.target.childNodes[2].nodeValue.includes("Business")){
-                _showTabPane("#bt-add-content-box .tab-content .tab-pane#add-business")
+                _showAddModal("add-business-form.html")
             }
+        }
+
+        if(e.target && (e.target.matches(".btn-close-add-modal")||e.target.matches(".btn-close-add-modal span") )){
+            let elem = document.getElementById("bt-add-modal-content").parentNode.parentNode
+            elem.style.display="none"
+        }
+        
+    }// function do action on setup content
+    
+    
+    function _showAddModal(filePath){
+        var xhr= new XMLHttpRequest();
+        xhr.open('GET', filePath, true);
+        xhr.onreadystatechange= function() {
+            if (this.readyState!==4) return;
+            if (this.status!==200) return; // or whatever error handling you want
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                var elem = document.getElementById("bt-add-modal-content")
+                elem.innerHTML = xhr.responseText;
+                elem.parentNode.parentNode.style.display="block";
+            }
+        };
+        xhr.send();
+        showDatepicker()
+    }
+
+    
+    
+    function showDatepicker(){
+        setTimeout(()=>{
+            $('.form_datetime').datetimepicker({
+                language:  'en',
+                format:'dd/mm/yyyy', /* 'dd/mm/yyyy hh:ii' */
+                /* showMeridian: 1 */
+                startView: 2,
+                minView:2,
+                weekStart: 1,
+                todayBtn:  1,
+                autoclose: 1,
+                todayHighlight: 1,
+                forceParse: 0,
+            });
+        },15)
+    }
+
+
+    function _hideActiveTab(){
+        let activeTabEl = document.querySelector(".nav-tabs li.active")
+        if(activeTabEl) activeTabEl.classList.remove("active")
+        
+    }
+    function hideActiveTabPane(){
+        let tab_paneEl = document.querySelector("#bt-add-content-box .tab-content .tab-pane.active")
+        if(tab_paneEl) tab_paneEl.classList.remove("active")
+    }
+    
+    
+    function _makeTabActiveWithoutContent(node){
+        _hideActiveTab()
+        if(node.nodeName){
+            node.parentNode.classList.add("active")
+        }else{ // querySelector passed
+            document.querySelector(node).classList.add("active")
         }
         
     }
+    
+    function _showTabPane(selector){
+        hideActiveTabPane();
+        let tab_paneEl = document.querySelector(selector)
+        if(tab_paneEl) tab_paneEl.classList.add("active")    
+        if(tab_paneEl) tab_paneEl.classList.add("in")    
+    }
+    
+    
+    
     
     
     function actionOnTableModalKeyUp(e){
@@ -224,33 +303,6 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
     
     
     
-    function _hideActiveTab(){
-        let activeTabEl = document.querySelector(".nav-tabs li.active")
-        if(activeTabEl) activeTabEl.classList.remove("active")
-        
-    }
-    function hideActiveTabPane(){
-        let tab_paneEl = document.querySelector("#bt-add-content-box .tab-content .tab-pane.active")
-        if(tab_paneEl) tab_paneEl.classList.remove("active")
-    }
-    
-    
-    function _makeTabActiveWithoutContent(node){
-        _hideActiveTab()
-        if(node.nodeName){
-            node.parentNode.classList.add("active")
-        }else{ // querySelector passed
-            document.querySelector(node).classList.add("active")
-        }
-        
-    }
-    
-    function _showTabPane(selector){
-        hideActiveTabPane();
-        let tab_paneEl = document.querySelector(selector)
-        if(tab_paneEl) tab_paneEl.classList.add("active")    
-        if(tab_paneEl) tab_paneEl.classList.add("in")    
-    }
     function _offset(el) {
         var rect = el.getBoundingClientRect(),
         scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,

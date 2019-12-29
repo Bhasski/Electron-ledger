@@ -124,7 +124,7 @@ function getWindowBounds(remote){
                         if(!isSetUpNeeded){
                             let tabPaneActionEl = document.querySelector(".bt-tab-pane-top-btn-box")
                             // console.log("Hiiisss")
-                            if(tabPaneActionEl) my_html_magic_lib.hideActiveTabPane()
+                            // if(tabPaneActionEl) my_html_magic_lib.hideActiveTabPane()
                         }else{
                             my_html_magic_lib.makeTabActive("ul.nav-tabs li.add-master","#bt-add-content-box .tab-content .tab-pane#add-master")
                         }
@@ -132,26 +132,14 @@ function getWindowBounds(remote){
                 };
                 xhr.send();
                 
-                setTimeout(()=>{
-                    if(file ==="setup.html")my_html_magic_lib.sendTableForRecordBox("Product") //click changes to product data
-                    $('.form_datetime').datetimepicker({
-                        language:  'en',
-                        weekStart: 1,
-                        todayBtn:  1,
-                        autoclose: 1,
-                        todayHighlight: 1,
-                        minView:2,
-                        startView: 2,
-                        forceParse: 0,
-                        format:'dd/mm/yyyy', /* 'dd/mm/yyyy hh:ii' */
-                        /* showMeridian: 1 */
-                    });
-                },10)
+                if(file ==="setup.html")my_html_magic_lib.sendTableForRecordBox("Product") //click changes to product data
             } // end if 
         }) // sidebar clicks close
         
+
+
+
         /* Tabinf html  magic  on table */
-        
         document.getElementById("bt-add-content-box").addEventListener("focusin",my_html_magic_lib.actionOnTransactionModals)// focusin
         
         document.getElementById("bt-add-content-box").addEventListener("keyup",(e)=>{
@@ -160,7 +148,7 @@ function getWindowBounds(remote){
             if((e.target.nodeName=='TD')&& (e.target.getAttribute("get-data"))){
                 let value = $(e.target).text().toLowerCase();
                 var filterLength = $("#bt-modal-on-table-column div b").filter(function() {
-                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                 }).length 
                 // console.log(filterLength) 
             }
@@ -169,6 +157,9 @@ function getWindowBounds(remote){
         document.getElementById("bt-add-content-box").addEventListener("mousedown",(e)=>{
             if(e.button ==0) my_html_magic_lib.sendTableModalDataToParent(e)
         })//mouse down
+        
+        
+        
         
         /*--------------------- IPC Section -----------------*/
         ipc.on("initData", function(evt,result){
@@ -197,7 +188,7 @@ function getWindowBounds(remote){
                 tHeadStr += "<th>Action</th></thead>"
                 tBodyStr += "</tbody>"
                 let htmlStr = "<table class=\"table table-bordered table-condensed table-hover table-striped\">"+tHeadStr+tBodyStr+"</table>"
-                setTimeout(()=>{recordEl.innerHTML = htmlStr;},10)// let record box be there
+                recordEl.innerHTML = htmlStr// let record box be there
                 
             }// if not empty
         }) //ipc for record Box

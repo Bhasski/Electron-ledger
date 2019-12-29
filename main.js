@@ -229,18 +229,14 @@ ipc.on("CATCH_NOTIFICATION",(ev,options)=>{
   n.show()
 })
 
-ipc.on("saveProduct",(ev,data)=>{
+ipc.on("saveObject",(ev,data)=>{
   console.log("data sent :", data)
   myLedgerMains.saveObject(data,(err,notOptions)=>{
     new Notification(notOptions).show()
   })
   
 })
-ipc.on("saveBusiness",(ev,data)=>{
-  console.log("data sent :", data)
-  
-  myLedgerMains.saveObject(data)
-})
+
 
 ipc.on("tableForRecordBox",(ev,tableName)=>{
   console.log("Table name for records: ",tableName)

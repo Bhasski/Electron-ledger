@@ -8,125 +8,11 @@
 <div class="bt-tab-pane-top-btn-box">
     <button type="button" class="btn btn-default" aria-label="Left Align">
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Product</button>
-</div><br>
-<div class="tab-content" id="myTabContent">
-    <!-- tab pane for master -->
-    <div class="tab-pane fade in active" id="add-master" role="tabpanel" aria-labelledby="profile-tab">
-        <div class="row" id="bt-setup-form">
-            <div class="col-md-12">
-                
-                <form action="#" class="form-horizontal">
-                    <div class="row">
-                        <div class="form-group col-sm-6">
-                            <label for="first_name" class="col-xs-3 control-label">Master Name</label>
-                            <div class="col-xs-9">
-                                <input type="text" class="form-control" id="master_name" name="master_name" placeholder="Enter Institute name">
-                            </div>
-                        </div>
-                        <div class="form-group col-sm-6">
-                            <label for="last_name" class="col-xs-3 control-label">Address</label>
-                            <div class="col-xs-9">
-                                <input type="text" class="form-control" id="master_address" name="master_address" placeholder="Address">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-sm-6">
-                            <label for="first_name" class="col-xs-3 control-label">Phone</label>
-                            <div class="col-xs-9">
-                                <input type="tel" class="form-control" id="master_phone" name="master_phone" aria-describedby="phoneStatus" placeholder="Phone number">
-                            </div>
-                        </div>
-                        <div class="form-group col-sm-6">
-                            <label for="" class="col-xs-3 control-label">Email</label>
-                            <div class="col-xs-9">
-                                <input type="text" class="form-control" id="master_email" name="master_email" placeholder="Email Id">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="" style="text-align: center;">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </div>
-                    </div>
-                </form>
-                
-            </div>
-        </div>
-    </div>
-    <!-- tab pane for product -->
-    <div class="tab-pane fade" id="add-product" role="tabpanel" aria-labelledby="home-tab">
-        <div class="row">
-            <div class="col-sm-6">
-                <label class="control-label">Product Name</label>
-                <input class="form-control" type="text" name="" id="product-add-name">
-            </div>
-            <div class="col-sm-6">
-                <label for="">Manufacturer</label>
-                <input type="text" class="form-control" id="product-add-manufacturer">
-            </div>
-            
-        </div>
-        <div class="row">
-            <div class="col-sm-4">
-                <label for="">Variety</label>
-                <input type="text" class="form-control" id="product-add-variety">
-            </div>
-            <div class="col-sm-4">
-                <label for="">Manufacture Date</label>
-                <div class="input-group date form_datetime col-md-12"  data-date-format="dd-MM-yyyy" >
-                    <input class="form-control" id="product-add-dom" type="text" value="" readonly>
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-					<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                </div>
-            </div>
-            <div class="col-sm-4">
-                <label for="">Expiry Date</label>
-                <div class="input-group date form_datetime col-md-12"  data-date-format="dd MM yyyy - HH:ii p">
-                    <input class="form-control" id="product-add-doe" size="16" type="text" value="" readonly>
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-					<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                </div>
-            </div>
-        </div>
-        <div class="row bt-submit-row">
-            <button class="btn btn-primary" id="product-add-submit" type="submit">Add</button>
-        </div>
-    </div>
-    <!-- Business/Party Pane     -->
-    <div class="tab-pane fade" id="add-business" role="tabpanel" aria-labelledby="contact-tab">
-
-        <div class="row">
-            <div class="col-sm-8">
-                <label class="control-label">Business/Party Name</label>
-                <input class="form-control" type="text" name="" id="business-add-name">
-            </div>
-            <div class="col-sm-4">
-                <label class="control-label">Proprietor</label>
-                <input class="form-control" type="text" name="" id="business-add-proprietor">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <label for="">Address</label>
-                <input type="text" placeholder="ABC Colony XYZ City" class="form-control" id="business-add-address">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-6">
-                <label for="">Phone</label>
-                <input type="tel" placeholder="Eg:98724xxxxx" class="form-control" id="business-add-phone">
-            </div>
-            <div class="col-sm-6">
-                <label for="">Email</label>
-                <input type="text" placeholder="abc@gmail.com" class="form-control" id="business-add-email">
-            </div>
-        </div>
-        <div class="row bt-submit-row">
-            <button class="btn btn-primary" id="business-add-submit" type="submit">Add</button>
-        </div>
-    </div>
+    </div><br>
 </div>
+
+<div class="tab-content" id="myTabContent">
+    <!-- tab pane for product -->
 </div>
 
 <!-- Below content -->
@@ -134,5 +20,16 @@
     <p class="page-header bt-sub-header" style="text-align: center;"><b>Records</b></p>
     <div class="col-sm-12" id="bt-below-content">
         
+    </div>
+</div>
+
+<div class="position-abs-center-child">
+    <div id="bt-add-modal-box"  >
+        <div class="row">
+            <button class="btn btn-default btn-close-add-modal" style="float: right;"><span class="glyphicon glyphicon-remove"></span></button>
+        </div>
+        <div class="row"  id="bt-add-modal-content">
+            
+        </div>
     </div>
 </div>
