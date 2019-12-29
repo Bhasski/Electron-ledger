@@ -87,7 +87,7 @@ function getWindowBounds(remote){
         
         
         // take  DATA from different forms and send to main.js for further process 
-        document.getElementById("bt-add-content-box").addEventListener("click",(e)=>{
+        document.getElementById("bt-add-content-box").parentNode.addEventListener("click",(e)=>{
             my_html_magic_lib.doActionOnSetUpContent(e,isSetUpNeeded);
         })// end 'click' delegation on content box
         
@@ -136,22 +136,16 @@ function getWindowBounds(remote){
             } // end if 
         }) // sidebar clicks close
         
-
-
-
+        
+        
+        
         /* Tabinf html  magic  on table */
         document.getElementById("bt-add-content-box").addEventListener("focusin",my_html_magic_lib.actionOnTransactionModals)// focusin
         
         document.getElementById("bt-add-content-box").addEventListener("keyup",(e)=>{
             my_html_magic_lib.actionOnTableModalKeyUp(e)
-            //filter on data
-            if((e.target.nodeName=='TD')&& (e.target.getAttribute("get-data"))){
-                let value = $(e.target).text().toLowerCase();
-                var filterLength = $("#bt-modal-on-table-column div b").filter(function() {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-                }).length 
-                // console.log(filterLength) 
-            }
+            
+            
         })//key up
         
         document.getElementById("bt-add-content-box").addEventListener("mousedown",(e)=>{
@@ -173,7 +167,7 @@ function getWindowBounds(remote){
         
         ipc.on("dataForRecordBox",(ev,data)=>{
             if(!isEmptyObj(data)){
-                let recordEl = document.getElementById("bt-below-content")
+                let recordEl = document.getElementById("bt-below-setup-content")
                 let tHeadStr;
                 let tBodyStr = "<tbody>"
                 for (row of data){
@@ -188,7 +182,7 @@ function getWindowBounds(remote){
                 tHeadStr += "<th>Action</th></thead>"
                 tBodyStr += "</tbody>"
                 let htmlStr = "<table class=\"table table-bordered table-condensed table-hover table-striped\">"+tHeadStr+tBodyStr+"</table>"
-                recordEl.innerHTML = htmlStr// let record box be there
+                if(recordEl) recordEl.innerHTML = htmlStr// let record box be there
                 
             }// if not empty
         }) //ipc for record Box

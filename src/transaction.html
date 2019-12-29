@@ -4,7 +4,6 @@
     <li><a data-toggle="tab" href="#profile">Daily</a></li>
     <li><a data-toggle="tab" href="#contact">Search</a></li>
 </ul>
-<p></p>
 
 <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade in active" id="business" role="tabpanel" aria-labelledby="home-tab">
@@ -15,7 +14,7 @@
                  <label class="col-sm-3 control-label" for="input">Select Business</label>
                     <div class="col-sm-9">
                         <input type="text" tabindex="0" id="business-name" 
-                        get-data="Business-name" class="form-control bt-select-business" readonly>
+                        get-data="Business-name" class="form-control bt-select-business" >
                     </div>
                 </div>
                 <div class="col-sm-5">
@@ -38,17 +37,17 @@
                 <th class="col-sm-1">Qty</th>
                 <th class="col-sm-1">Unit</th>
                 <th class="col-sm-1">Unit Price</th>
-                <th class="col-sm-2">Amount Billed</th>
+                <th class="col-sm-2">Amount </th>
                 <th class="col-sm-1">Action</th>
             </thead>
             <tbody>
                 <tr>
                     <td tabIndex="0" contenteditable="true"  get-data="Product-name"></td>
-                    <td tabIndex="0" contenteditable="true"  get-data="Product-manufacturer"></td>
-                    <td tabIndex="0" contenteditable="true"  get-data="Product-variety"></td>
-                    <td tabIndex="0" contenteditable="true" data-text="Quantity"></td>
+                    <td tabIndex="0" contenteditable="false"  get-data="Product-manufacturer"></td>
+                    <td tabIndex="0" contenteditable="false"  get-data="Product-variety"></td>
+                    <td tabIndex="0" contenteditable="true" class="prod-qty" data-text="Quantity"></td>
                     <td>
-                        <select name="" id="prod_qty" >
+                        <select name="" id="prod_qty" class="prod-unit">
                             <option value="unit">unit(s)</option>
                             <option value="gm">g(s)</option>
                             <option value="kg">Kg(s)</option>
@@ -56,8 +55,8 @@
                             <option value="ctn">Case</option>
                         </select>
                     </td>
-                    <td tabIndex="0" contenteditable="true" data-text="Unit Price" ></td>
-                    <td tabIndex="0"  data-text="Amount"></td>
+                    <td tabIndex="0" contenteditable="true" class="prod-unit-price" data-text="Price" ></td>
+                    <td tabIndex="-1" no-tab contenteditable="false" data-text="Total"></td>
                     <td tabIndex="0" >
                         <button><span class="glyphicon glyphicon-plus"></span></button>
                     </td>
@@ -77,7 +76,7 @@
     <!-- Below content -->
 <div class="row bt-below-content-wrapper">
     <p class="page-header bt-sub-header" style="text-align: center;"><b>Records</b></p>
-    <div class="col-sm-12" id="bt-below-content">
+    <div class="col-sm-12" id="bt-below-transaction-content">
         
     </div>
 </div>

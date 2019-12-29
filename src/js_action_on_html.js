@@ -87,18 +87,14 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
             
         }// if
         
-        if(e.target && e.target.matches(".bt-tab-pane-top-btn-box button")){
-            if(e.target.childNodes[2].nodeValue.includes("Master")){
-                _showAddModal("add-master-form.html")
-            }
-            if(e.target.childNodes[2].nodeValue.includes("Product")){
-                _showAddModal("add-product-form.html")
-            }
-            if(e.target.childNodes[2].nodeValue.includes("Business")){
-                _showAddModal("add-business-form.html")
-            }
-        }
-
+        if(e.target.matches(".bt-tab-pane-top-btn-box button")|| e.target.matches(".bt-tab-pane-top-btn-box button span")){
+            let nodeName = e.target.nodeName;
+            let nodeVal = (nodeName =='BUTTON')?e.target.childNodes[2].nodeValue :e.target.nextSibling.nodeValue;
+            if(nodeVal.includes("Master")) showAddModal("add-master-form.html")
+            if(nodeVal.includes("Product")) showAddModal("add-product-form.html")
+            if(nodeVal.includes("Business")) showAddModal("add-business-form.html")
+        }// add modal show on button click
+        
         if(e.target && (e.target.matches(".btn-close-add-modal")||e.target.matches(".btn-close-add-modal span") )){
             let elem = document.getElementById("bt-add-modal-content").parentNode.parentNode
             elem.style.display="none"
@@ -107,7 +103,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
     }// function do action on setup content
     
     
-    function _showAddModal(filePath){
+    function showAddModal(filePath){
         var xhr= new XMLHttpRequest();
         xhr.open('GET', filePath, true);
         xhr.onreadystatechange= function() {
@@ -122,7 +118,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
         xhr.send();
         showDatepicker()
     }
-
+    
     
     
     function showDatepicker(){
@@ -141,8 +137,8 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
             });
         },15)
     }
-
-
+    
+    
     function _hideActiveTab(){
         let activeTabEl = document.querySelector(".nav-tabs li.active")
         if(activeTabEl) activeTabEl.classList.remove("active")
@@ -188,19 +184,29 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
         }//up arrow
         if(e.key=="Tab" || e.keyCode == '9'){
             tabActionAndTransactionModalsData(e)
+
         }//key COde TAB
         
         if(e.key=="Enter" || e.keyCode == '13'){
             sendTableModalDataToParent(e)
             
         }// key code ENTER
+        _filterOnModalData(e) //filter on data drop on if td/ input with get-data
+
+        if(e.shiftKey && e.keyCode == 9) { 
+           if (e.target.nodeName=='TD' && e.target.getAttribute("get-data")){
+               if(e.target.isSameNode(e.target.parentNode.firstElementChild)){
+                   e.target.innerHTML=""
+               }
+           }               
+        }
     }
     
     let tdModalCondtionToFetchData = {}//global
     
     function tabActionAndTransactionModalsData(e){
         let that = e.currentTarget;
-        if((e.target.nodeName =="TD" || e.target.id =="business-name") && (  e.target.getAttribute("get-data")) ){
+        if((e.target.nodeName =="TD" || e.target.nodeName =="INPUT") && (  e.target.getAttribute("get-data")) ){
             let currTabIndex = e.target.getAttribute("tabIndex")
             let tabIndexForModal = parseInt(currTabIndex)+1
             let tabIndexForSiblings = parseInt(currTabIndex)+3
@@ -217,33 +223,37 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
                 tableCols.forEach((td)=>{
                     td.setAttribute("tabIndex",tabIndexForSiblings)
                 })
-            }
+                tdModalCondtionToFetchData = {}
+            }// if business name input
+            
             if(e.target.nodeName =='TD'){
                 let nextAllSiblings = $(e.target).nextAll()
                 nextAllSiblings.attr("tabIndex",tabIndexForSiblings)// IMPORTANT! changing tabIndex for comings TDs
                 nextAllSiblings.each((ev,item)=>{
                     // console.log(nextAllSiblings)
-                    if($(item).find("select,input,button").length >0){
+                    let attr = $(item).attr('no-tab');
+                    let hasAttrNoTab = typeof attr !== typeof undefined && attr !== false ;
+                    if($(item).find("select,input,button").length >0 || hasAttrNoTab ){
                         $(item).attr("tabIndex","-1")   
                         $(item).find("select,input,button").attr("tabIndex",parseInt(tabIndexForSiblings))
                     }
                 })
-            }
-            
-            if(!e.target.isSameNode(e.target.parentNode.firstElementChild)){
-                
-                if(that.querySelector("td.active-modal")){ //previous active modal if there
-                    let prevModalColumn = that.querySelector("td.active-modal");
-                    let prvColAttr = prevModalColumn.getAttribute("get-data")
-                    let isPrevElDataSet = that.querySelector("td.active-modal").getAttribute("data-set")
-                    if(isPrevElDataSet =="true"){
-                        tdModalCondtionToFetchData[prvColAttr.split("-")[1]] = prevModalColumn.innerHTML 
+                if(!e.target.isSameNode(e.target.parentNode.firstElementChild)){
+                    
+                    if(that.querySelector("td.active-modal")){ //previous active modal if there
+                        let prevModalColumn = that.querySelector("td.active-modal");
+                        let prvColAttr = prevModalColumn.getAttribute("get-data")
+                        let isPrevElDataSet = that.querySelector("td.active-modal").getAttribute("data-set")
+                        if(isPrevElDataSet =="true"){
+                            tdModalCondtionToFetchData[prvColAttr.split("-")[1]] = prevModalColumn.innerHTML 
+                        }
                     }
+                }else{  // check for first child,to clear conditions
+                    // console.log("first child")
+                    tdModalCondtionToFetchData = {}
                 }
-            }else{  // check for first child,to clear conditions
-                console.log("first child")
-                tdModalCondtionToFetchData = {}
-            }
+            }// if table column
+            
             // remove the class now
             if(that.querySelector(".active-modal")){
                 that.querySelector(".active-modal").classList.remove("active-modal")
@@ -269,22 +279,27 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
             setTimeout(() => {
                 showTableColumnModal(modalOptions,targetWidth)
             }, 15); 
+
             
         } // get-data attribute
         
         
-    }
+    }// function
     
     function sendTableModalDataToParent(e){
         if(e.target.className == "table-modal-content" || e.target.parentNode.className =="table-modal-content"){
             let parentToModal = document.querySelector(".active-modal")
+            let currTabIndex = parentToModal.getAttribute("tabIndex")
+            let nextNonModalTabIndex = parseInt(currTabIndex)+3
             if(parentToModal.tagName =='INPUT'){
                 parentToModal.value = e.target.innerText
             }else{
                 parentToModal.innerHTML = e.target.innerText
                 parentToModal.setAttribute("data-set","true")
-                parentToModal.nextElementSibling.focus()
+                // parentToModal.nextElementSibling.focus()
             }
+            document.querySelector("[tabIndex='"+nextNonModalTabIndex+"']").focus()
+            // console.log("current tab index ",currTabIndex)
             // parentToModal.classList.remove("active-modal")
             if (e.target.className == "table-modal-content") e.target.parentNode.style.display = "none"
             if (e.target.parentNode.className =="table-modal-content") e.target.parentNode.parentNode.style.display = "none"
@@ -300,7 +315,41 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
     }
     
     
-    
+    function _filterOnModalData(e){
+        if((e.target.nodeName=='TD' || e.target.nodeName =='INPUT') && (e.target.getAttribute("get-data"))){
+            let value = (e.target.nodeName=='TD')? $(e.target).text().toLowerCase(): $(e.target).val().toLowerCase();
+            var $items = $("#bt-modal-on-table-column div b")
+            var $filter = $items.filter(function() {
+                // $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                return $(this).text().toLowerCase().indexOf(value) > -1
+            })
+            var $nonFiltered = $items.not($filter)
+            console.log("elements found, ",$filter.length) 
+
+            $items.toggle(false)
+            $nonFiltered.each(function(){$(this).parent().attr("tabIndex","-1")})//remove tabs from non matching
+            
+            $filter.toggle(true)
+            if($filter.length == 0){
+                const { dialog } = require('electron').remote
+                let objectStr;
+                let filename;
+                if (e.target.id =="business-name") {objectStr="Business"; filename = "add-business-form.html"}
+                if (e.target.nodeName =="TD"){objectStr="Product"; filename = "add-product-form.html"}
+
+                dialog.showMessageBox({
+                    type:"question",
+                    title:"No "+objectStr+" Found",
+                    message:"Do you want to add this new "+objectStr+"?",
+                    buttons:['Cancel', 'Yes, please']
+                }).then((val)=>{
+                    if(val.response == 1){
+                        my_html_magic_lib.showAddModal(filename)
+                    }
+                })
+            }// if filter no match
+        }// if filter is a td or input with fet data
+    }// function
     
     
     function _offset(el) {
@@ -332,7 +381,8 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
         sendTableForRecordBox: sendTableForRecordBox,
         actionOnTableModalKeyUp: actionOnTableModalKeyUp,
         actionOnTransactionModals: tabActionAndTransactionModalsData,
-        sendTableModalDataToParent: sendTableModalDataToParent
+        sendTableModalDataToParent: sendTableModalDataToParent,
+        showAddModal:showAddModal
         
     }
 })();
