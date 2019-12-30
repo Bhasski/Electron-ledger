@@ -278,7 +278,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
         if (e.target.className.includes("action-remove-row") || e.target.matches(".action-remove-row span")){
             let rowNode = e.target.parentNode.parentNode
             if(rowNode.nodeName == "BUTTON") rowNode = rowNode.parentNode.parentNode
-            if( !rowNode.isSameNode(rowNode.parentNode.firstElementChild)){
+            if(rowNode.parentNode.querySelectorAll("tr").length >1){
                 document.querySelector("#business-transaction-table tbody").removeChild(rowNode)
             }else{ new Notification('ERROR!',{body:'Single row cannot be removed'})}
         }
