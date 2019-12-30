@@ -37,7 +37,6 @@ const path = require('path')
 const ipc = require('electron').ipcMain
 const appDao = require('./src/dao/AppDao')
 const myLedgerMains = require('./src/bt_ledger_main')
-const tableColumnMapper = require('./src/bt-column-name-mapper')
 
 
 // Keep a global reference of the window object, if you don't, the window will

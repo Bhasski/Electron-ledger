@@ -1,6 +1,7 @@
 var my_html_magic_lib = my_html_magic_lib || (function(){
     var ipc  = require('electron').ipcRenderer
     
+
     function _saveObject(data,myCallback){
         ipc.send('saveObject',data);
         setTimeout(() => {if(myCallback) myCallback()}, 10);
@@ -183,24 +184,130 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
             }
         }//up arrow
         if(e.key=="Tab" || e.keyCode == '9'){
-            tabActionAndTransactionModalsData(e)
-
+            tabActionAndTransactionModalsData(e) // inside only on td and input with get data
+            
         }//key COde TAB
         
         if(e.key=="Enter" || e.keyCode == '13'){
-            sendTableModalDataToParent(e)
+            _sendTableModalDataToParent(e)
+            _cloneRow(e)
             
         }// key code ENTER
         _filterOnModalData(e) //filter on data drop on if td/ input with get-data
-
+        
         if(e.shiftKey && e.keyCode == 9) { 
-           if (e.target.nodeName=='TD' && e.target.getAttribute("get-data")){
-               if(e.target.isSameNode(e.target.parentNode.firstElementChild)){
-                   e.target.innerHTML=""
-               }
-           }               
+            if (e.target.nodeName=='TD' && e.target.getAttribute("get-data")){
+                if(e.target.isSameNode(e.target.parentNode.firstElementChild)){
+                    e.target.innerHTML="" //make empty
+                }
+            }               
+        }// back TAB (using shift)
+        
+        
+        _validateAndMakeDateInLedgerRow(e);// needs all keys
+        
+        
+    }//key up on content
+    
+    function actionOnMouseKey(e){
+        //left mouse click
+        if(e.button ==0) {
+            _sendTableModalDataToParent(e)
+            _removeTransactionRow(e)
+            _cloneRow(e)
+        } 
+    }
+
+    function _cloneRow(e) {
+        if(e.target.className.includes("action-add-row") || e.target.matches(".action-add-row span") ){
+            let parentEl = e.target.parentNode.parentNode
+            if (parentEl.nodeName == "BUTTON") parentEl = parentEl.parentNode.parentNode;
+            if(_isTransactionRowValid(parentEl)){
+                let indexOfCurrRow = parentEl.id.split("-")[3]
+                let cloneId = "business-tx-row-"+ (parseInt(indexOfCurrRow,10)+1)
+                const{TRANSACTION_ROW_STRING} = require('./constants')
+                // console.log("action add row clicked")
+                if (document.getElementById(cloneId) == null || document.getElementById(cloneId) == undefined){
+                    let currElTabIndex = e.target.tabIndex
+                    var cloneRow  = _getTransactionRow(TRANSACTION_ROW_STRING)    
+                    cloneRow.id = cloneId
+                    cloneRow.firstElementChild.tabIndex = parseInt(currElTabIndex,10)+1
+                    var table = document.getElementById("business-transaction-table"); // find table to append to
+                    let tbody = table.querySelector("tbody")
+    
+                    tbody.appendChild(cloneRow); // append row to table
+                }
+
+            } // if transaction row valid
+        }//if action-add button
+    }// function cloneRow
+    
+    
+    function _isTransactionRowValid(parentRow){
+        let notificMsg =""
+        let isValid = false
+        if(! parentRow.querySelector("td.prod-name").innerHTML)
+        {notificMsg += " Choose Product Name value;"}
+        if(! parentRow.querySelector("td.prod-manufacturer").innerHTML)
+        {notificMsg += " Choose Product Manufacturer ;"}
+        if(! parentRow.querySelector("td.prod-variety").innerHTML )
+        {notificMsg += " Choose Product variety ;"}
+        if(! parentRow.querySelector("td.prod-qty").innerHTML )
+        {notificMsg += " Enter valid product quantity; "}
+        if(! parentRow.querySelector("td.prod-unit-price").innerHTML )
+        {notificMsg += " Enter valid product unit price; "}
+        else{
+            isValid = true
+        }
+        if(notificMsg){
+            new Notification("ERROR!",{body:notificMsg})
+        }
+        console.log("is row valid: ",isValid)
+        return isValid
+    }// function transaction Row Valid
+
+
+
+    function _getTransactionRow(htmlStr){
+        var tbody = document.createElement('tbody'); // create row node
+        tbody.innerHTML = htmlStr.trim();
+        return tbody.firstElementChild
+    }
+
+    function _removeTransactionRow(e){
+        if (e.target.className.includes("action-remove-row") || e.target.matches(".action-remove-row span")){
+            let rowNode = e.target.parentNode.parentNode
+            if(rowNode.nodeName == "BUTTON") rowNode = rowNode.parentNode.parentNode
+            if( !rowNode.isSameNode(rowNode.parentNode.firstElementChild)){
+                document.querySelector("#business-transaction-table tbody").removeChild(rowNode)
+            }else{ new Notification('ERROR!',{body:'Single row cannot be removed'})}
         }
     }
+
+    function  _validateAndMakeDateInLedgerRow(e){
+        if(e.target.className =="prod-qty"){
+            if(isNaN(e.target.innerHTML)) e.target.innerHTML=""
+        }
+        
+        if (e.target.className == "prod-unit-price"){
+            if(isNaN(e.target.innerHTML)){
+                e.target.innerHTML=""
+            }else{
+                let unitPriceVal = parseFloat(e.target.innerHTML)
+                let parentRow = e.target.parentNode
+                let qtyVal = parentRow.querySelector("td.prod-qty").innerHTML                
+                if(qtyVal.length <= 0 || isNaN(qtyVal)){
+                    new Notification('Error! Wrong Quantity',{body:'Quantity cannot be empty'})
+                }else{
+                    let totalEl = parentRow.querySelector("td.prod-total")
+                    let result = unitPriceVal * parseInt(qtyVal,10)
+                    if(!isNaN(result)) totalEl.innerHTML = result.toLocaleString()
+                }
+            }
+        }// unit price in each row
+    }// validate and produce ledger row data 
+    
+    
     
     let tdModalCondtionToFetchData = {}//global
     
@@ -279,14 +386,14 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
             setTimeout(() => {
                 showTableColumnModal(modalOptions,targetWidth)
             }, 15); 
-
+            
             
         } // get-data attribute
         
         
     }// function
     
-    function sendTableModalDataToParent(e){
+    function _sendTableModalDataToParent(e){
         if(e.target.className == "table-modal-content" || e.target.parentNode.className =="table-modal-content"){
             let parentToModal = document.querySelector(".active-modal")
             let currTabIndex = parentToModal.getAttribute("tabIndex")
@@ -299,8 +406,6 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
                 // parentToModal.nextElementSibling.focus()
             }
             document.querySelector("[tabIndex='"+nextNonModalTabIndex+"']").focus()
-            // console.log("current tab index ",currTabIndex)
-            // parentToModal.classList.remove("active-modal")
             if (e.target.className == "table-modal-content") e.target.parentNode.style.display = "none"
             if (e.target.parentNode.className =="table-modal-content") e.target.parentNode.parentNode.style.display = "none"
         }
@@ -325,18 +430,21 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
             })
             var $nonFiltered = $items.not($filter)
             console.log("elements found, ",$filter.length) 
-
-            $items.toggle(false)
+            
             $nonFiltered.each(function(){$(this).parent().attr("tabIndex","-1")})//remove tabs from non matching
             
-            $filter.toggle(true)
+            setTimeout(() => {
+                $items.toggle(false)
+                $filter.toggle(true)
+            }, 10);
+            
             if($filter.length == 0){
                 const { dialog } = require('electron').remote
                 let objectStr;
                 let filename;
                 if (e.target.id =="business-name") {objectStr="Business"; filename = "add-business-form.html"}
                 if (e.target.nodeName =="TD"){objectStr="Product"; filename = "add-product-form.html"}
-
+                
                 dialog.showMessageBox({
                     type:"question",
                     title:"No "+objectStr+" Found",
@@ -381,8 +489,8 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
         sendTableForRecordBox: sendTableForRecordBox,
         actionOnTableModalKeyUp: actionOnTableModalKeyUp,
         actionOnTransactionModals: tabActionAndTransactionModalsData,
-        sendTableModalDataToParent: sendTableModalDataToParent,
-        showAddModal:showAddModal
+        showAddModal:showAddModal,
+        actionOnMouseKey:actionOnMouseKey
         
     }
 })();

@@ -2,9 +2,10 @@
 
 var LEDGER_MAINS = LEDGER_MAINS || (function(){
     'use strict';
-    var tableColumnMapper = require('./bt-column-name-mapper');
+    var constants = require('./constants');
     var appDao = require('./dao/AppDao')
     // var _ipc =  require('electron').ipcRenderer 
+    var tableColumnMapper = constants.tables
     var _appObject = {
         bt_tables: tableColumnMapper
     }

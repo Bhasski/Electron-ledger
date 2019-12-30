@@ -148,9 +148,7 @@ function getWindowBounds(remote){
             
         })//key up
         
-        document.getElementById("bt-add-content-box").addEventListener("mousedown",(e)=>{
-            if(e.button ==0) my_html_magic_lib.sendTableModalDataToParent(e)
-        })//mouse down
+        document.getElementById("bt-add-content-box").addEventListener("mousedown",my_html_magic_lib.actionOnMouseKey)//mouse down
         
         
         

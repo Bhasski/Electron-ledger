@@ -21,8 +21,8 @@
                     <label class="col-sm-5 control-label">Transaction Type</label>
                     <div class="col-sm-7">
                         <select class="form-control" name="" id="bt-business-type" >
-                            <option value="debit">DEBIT</option>
-                            <option value="credit">CREDIT</option>
+                            <option value="sale">SALE</option>
+                            <option value="purchase">PURCHASE</option>
                         </select>
                     </div>
               </div>
@@ -41,10 +41,10 @@
                 <th class="col-sm-1">Action</th>
             </thead>
             <tbody>
-                <tr>
-                    <td tabIndex="0" contenteditable="true"  get-data="Product-name"></td>
-                    <td tabIndex="0" contenteditable="false"  get-data="Product-manufacturer"></td>
-                    <td tabIndex="0" contenteditable="false"  get-data="Product-variety"></td>
+                <tr id="business-tx-row-1">
+                    <td tabIndex="0" contenteditable="true" class="prod-name" get-data="Product-name"></td>
+                    <td tabIndex="0" contenteditable="false" class="prod-manufacturer"  get-data="Product-manufacturer"></td>
+                    <td tabIndex="0" contenteditable="false" class ="prod-variety"  get-data="Product-variety"></td>
                     <td tabIndex="0" contenteditable="true" class="prod-qty" data-text="Quantity"></td>
                     <td>
                         <select name="" id="prod_qty" class="prod-unit">
@@ -56,9 +56,12 @@
                         </select>
                     </td>
                     <td tabIndex="0" contenteditable="true" class="prod-unit-price" data-text="Price" ></td>
-                    <td tabIndex="-1" no-tab contenteditable="false" data-text="Total"></td>
+                    <td tabIndex="-1" no-tab contenteditable="false" class="prod-total" data-text="Total"></td>
                     <td tabIndex="0" >
-                        <button><span class="glyphicon glyphicon-plus"></span></button>
+                        <button class="btn btn-xs btn-default action-add-row"><small><span class="glyphicon glyphicon-plus"></span></small></button>
+                        <button class="btn btn-xs btn-danger action-remove-row" data-toggle="tooltip" title="Only mouse click allowed">
+                            <small><span class="glyphicon glyphicon-minus"></span></small>
+                        </button>
                     </td>
                 </tr>
             </tbody>
@@ -82,3 +85,9 @@
 </div>
 <!-- Modal on Columns -->
 <div id="bt-modal-on-table-column"></div>
+
+<script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
