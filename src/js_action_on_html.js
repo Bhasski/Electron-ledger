@@ -288,7 +288,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
     }
 
     function _calcAndShowGrossAmount(e){
-        if(e.target.className.includes("prod-unit-price") ){
+        if(e.target.className.includes("prod-unit-price") || e.target.className.includes("prod-qty") ){
             setTimeout(() => {
                 let gross_item_count = 0
                 let gross_amount = 0
