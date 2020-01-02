@@ -88,7 +88,7 @@ function getWindowBounds(remote){
         
         // take  DATA from different forms and send to main.js for further process 
         document.getElementById("bt-add-content-box").parentNode.addEventListener("click",(e)=>{
-            my_html_magic_lib.doActionOnSetUpContent(e,isSetUpNeeded);
+            my_html_magic_lib.doActionOnContentOnClick(e,isSetUpNeeded);
         })// end 'click' delegation on content box
         
         

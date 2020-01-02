@@ -8,7 +8,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
     }
 
 
-    function doActionsOnSetUpConent(e,isSetUpNeeded){
+    function doActionsOnContentOnClick(e,isSetUpNeeded){
         let that = e.currentTarget ;
         if(e.target && e.target.matches("#bt-master-add-form button")){// master add
             e.preventDefault();
@@ -103,9 +103,64 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
             elem.style.display="none"
         }
         
-    }// function do action on setup content
+        // ---------------- click part if transaction file is there -----------------
+        if(e.target.matches("input#cash-switch")){
+            if(e.target.checked){
+                document.querySelectorAll(".summary-cash-row").forEach((row)=>{
+                    _fadeIn(row,"flex")
+                    _actionOnCashCol(e)
+                })
+            }else{
+                document.querySelectorAll(".summary-cash-row").forEach((row)=>{
+                    row.style.display="none"
+                    _removeTabIndexToCashCol()
+                })
+            }
+        }// if cash switch in transaction page
+
+
+    }// function for click action on content box
     
     
+
+    function _fadeIn(element,displayString) {
+        var op = 0.1;  // initial opacity
+        element.style.opacity = op;
+        element.style.display = (displayString)?displayString:"block";
+        var timer = setInterval(function () {
+            if (op >= 1){
+                clearInterval(timer);
+            }
+            element.style.opacity = op;
+            // element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+            op += op * 0.1;
+        }, 10);
+    }
+
+    function _actionOnCashCol(e){
+        let that = e.currentTarget
+        let lastRowFirstCol = document.querySelector("#business-transaction-table tr:last-child td:first-child")
+        
+        // tabIndex Logic from main function
+        let tabIndex = lastRowFirstCol.getAttribute("tabIndex")
+        let tabIndexForSiblings = parseInt(tabIndex,10)+3
+        let tabIndexForCashCol = tabIndexForSiblings+2
+
+        let businessInput = that.querySelector("#business-name")
+        
+        let cashCol = document.querySelector("#ledger-summary-box .gross-cash")
+        cashCol.setAttribute("tabIndex",tabIndexForCashCol)
+        setTimeout(() => {
+            if(!businessInput.value) businessInput.focus()
+            if(businessInput.value) lastRowFirstCol.focus()
+            
+        }, 100);
+    }
+
+    function _removeTabIndexToCashCol(){
+        document.querySelector("#ledger-summary-box .gross-cash").setAttribute("tabIndex","-1")
+    }
+
     function showAddModal(filePath){ // add Product or Business or Master
         var xhr= new XMLHttpRequest();
         xhr.open('GET', filePath, true);
@@ -197,17 +252,13 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
         }// key code ENTER
         
         if(e.shiftKey && e.keyCode == 9) { 
-            if (e.target.nodeName=='TD' && e.target.getAttribute("get-data")){
-                if(e.target.isSameNode(e.target.parentNode.firstElementChild)){
-                    e.target.innerHTML="" //make empty  
-                }
-            }               
+        
         }// back TAB (using shift)
         
         
         _filterOnModalData(e) //filter on data drop on if td/ input with get-data
         
-        if (document.getElementById("business-transaction-table").contains(e.target)){
+        if (document.querySelector(".tab-pane#business").contains(e.target)){
             _validateAndCalcAmountForRow(e);// needs all keys
             _calcAndShowGrossAmount(e)// on unit price
         }
@@ -232,7 +283,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
     function _hideModalOnNonParentClick(e){
         if( !e.target.getAttribute("get-data") ){
             modalEl_1 = document.getElementById("bt-modal-on-table-column")
-            modalEl_1.style.display = "none"
+            if (modalEl_1) modalEl_1.style.display = "none"
         }
     }
 
@@ -244,7 +295,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
                 let allColsWithAmount = document.querySelectorAll("table#business-transaction-table td.prod-total")
                 allColsWithAmount.forEach((col)=>{
                     if(col.innerHTML){
-                        console.log( "original: ",col.innerHTML,"parse: ",Number(col.innerHTML.trim()))
+                        // console.log( "original: ",col.innerHTML,"parse: ",Number(col.innerHTML.trim()))
                         gross_amount += parseFloat(col.innerHTML)
                         gross_item_count += 1
                     }
@@ -253,8 +304,17 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
                 document.querySelector("div#ledger-summary-box .gross-count-items").innerHTML = gross_item_count
                 
             }, 100);
-            
-        }// end if 
+        }// end if product-unit-price
+        if(e.target.className.includes("gross-cash")){
+            if(isNaN(e.target.innerHTML)){
+                e.target.innerHTML = ""
+            }else{
+                let gross_amount = document.querySelector("div#ledger-summary-box .gross-amount").innerHTML
+                gross_amount = parseFloat(gross_amount.replace(/\,/g,''))
+                let gross_remEL = document.querySelector("div#ledger-summary-box .gross-remaining")
+                gross_remEL.innerHTML = (gross_amount - parseFloat(e.target.innerHTML)).toLocaleString("hi")
+            }
+        } 
     }
 
     function _cloneRow(e) {
@@ -280,6 +340,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
                     let tbody = table.querySelector("tbody")
     
                     tbody.appendChild(cloneRow); // append row to table
+                    cloneRow.querySelector("td:first-child").focus()
                 }
 
             } // if transaction row valid
@@ -292,12 +353,16 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
         let prvElemToCheck = (elem.nodeName == 'TD')? elem.previousElementSibling : elem.parentNode.previousElementSibling
         if (prvElemToCheck && prvElemToCheck.nodeName == 'TD'){
             if ( prvElemToCheck.childNodes.length>0 || prvElemToCheck.innerHTML){// has value in previous
-                return _isValidValueForRow(prvElemToCheck)
+                 return _isValidValueForRow(prvElemToCheck)
             }else{  //previous element empty
-                _showNotificationForEmptyValue(prvElemToCheck)
-                console.log("before focusing on previous elem: ", prvElemToCheck)
-                prvElemToCheck.focus()
-                return false;
+                if(prvElemToCheck.className.includes("prod-total")){
+                    _isValidValueForRow(prvElemToCheck)// prod-total can be emp, but check for previous
+                }else{
+                    _showNotificationForEmptyValue(prvElemToCheck)
+                    console.log("before focusing on previous elem: ", prvElemToCheck)
+                    prvElemToCheck.focus()
+                    return false;
+                }
             } 
         }else{
             return true
@@ -326,13 +391,26 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
 
     function  _validateAndCalcAmountForRow(e){
         if(_isValidValueForRow(e.target)){
-            if(!document.querySelector("td.prod-name").innerHTML){
-                document.querySelector("td.prod-manufacturer").innerHTML=""
-                document.querySelector("td.prod-variety").innerHTML=""
+            let parentEl = e.target.parentNode
+            if (parentEl.nodeName =='TD') parentEl = parentEl.parentNode
+            if(!parentEl.firstElementChild.innerHTML){
+                parentEl.querySelector("td.prod-manufacturer").innerHTML=""
+                parentEl.querySelector("td.prod-variety").innerHTML=""
             }
 
             if(e.target.className =="prod-qty"){
                 if(isNaN(e.target.innerHTML)) e.target.innerHTML=""
+                
+                let parentRow = e.target.parentNode
+                let totalEL = parentRow.querySelector("td.prod-total")
+                if(e.target.innerHTML){
+                    let unitPriceVal = parentRow.querySelector("td.prod-unit-price").innerHTML
+                    if(unitPriceVal){
+                        totalEL.innerHTML = parseFloat(e.target.innerHTML) * parseFloat(unitPriceVal)
+                    }
+                }else{
+                    totalEL.innerHTML = ""
+                }
             }
 
             if (e.target.className == "prod-unit-price" ){
@@ -341,8 +419,9 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
                 }else{
                     let parentRow = e.target.parentNode
                     let totalEl = parentRow.querySelector("td.prod-total")
-                    let unitPriceVal = parseFloat(e.target.innerHTML)
+                    let unitPriceVal = e.target.innerHTML
                     if(unitPriceVal){ // found unit price value
+                        unitPriceVal = parseFloat(unitPriceVal)
                         let qtyVal = parentRow.querySelector("td.prod-qty").innerHTML                
                         if(qtyVal.length <= 0 || isNaN(qtyVal)){
                             // new Notification('Error! Wrong Quantity',{body:'Quantity cannot be empty'})
@@ -396,7 +475,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
         let that = e.currentTarget;
         if((e.target.nodeName =="TD" || e.target.nodeName =="INPUT") && (  e.target.getAttribute("get-data")) ){
             let currTabIndex = e.target.getAttribute("tabIndex")
-            let tabIndexForModal = parseInt(currTabIndex)+2
+            let tabIndexForModal = parseInt(currTabIndex)+1
             let tabIndexForSiblings = parseInt(currTabIndex)+3
             
             // pretext for data
@@ -421,15 +500,17 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
                 let nextAllSiblings = $(e.target).nextAll()
                 nextAllSiblings.attr("tabIndex",tabIndexForSiblings)// IMPORTANT! changing tabIndex for comings TDs
                 nextAllSiblings.each((ev,tableCol)=>{
-                    // console.log(nextAllSiblings)
                     let noTabAttrVal = $(tableCol).attr('no-tab');
                     let hasAttrNoTab = typeof noTabAttrVal !== typeof undefined && noTabAttrVal !== false ;
-                    console.log(tableCol," attribute: "+hasAttrNoTab)
+                    // console.log(tableCol," attribute: "+hasAttrNoTab)
                     if($(tableCol).find("select,input,button").length >0 || hasAttrNoTab ){
                         $(tableCol).attr("tabIndex","-1")   
-                        $(tableCol).find("select,input,button").attr("tabIndex",parseInt(tabIndexForSiblings))
+                        $(tableCol).find("select,input,button").attr("tabIndex",tabIndexForSiblings)
                     }
                 })
+
+                                
+
                 if(!e.target.isSameNode(e.target.parentNode.firstElementChild)){
                     
                     if(that.querySelector("td.active-modal")){ //previous active modal if there
@@ -441,12 +522,20 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
                         }
                     }
                 }else{  // check for first child,to clear conditions
-                    // console.log("first child")
                     tdModalCondtionToFetchData = {}
                 }
             }// if table column
             
-            // remove the class now
+            // any get-data Elem
+            let grossCashCol = document.querySelector("#ledger-summary-box .gross-cash") ;
+            if(grossCashCol.style.display !="none"){
+                grossCashCol.setAttribute("tabIndex",(tabIndexForSiblings+2))
+            }
+            let actionBtn = document.querySelector(".transaction-action-box button.save-transaction-btn")
+            actionBtn.setAttribute("tabIndex",(tabIndexForSiblings+3)) // SAVE BTN Made TabIndex Max
+
+
+            // remove the active class now
             if(that.querySelector(".active-modal")){
                 that.querySelector(".active-modal").classList.remove("active-modal")
             }
@@ -565,9 +654,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
     
     
     return{
-        doActionOnSetUpContent:function(event,isSetUpNeeded){
-            doActionsOnSetUpConent(event,isSetUpNeeded);
-        },
+        doActionOnContentOnClick: doActionsOnContentOnClick,
         hideActiveTabPane: hideActiveTabPane,
         makeTabActive: tabBtnAndContentActiveState,
         sendTableForRecordBox: sendTableForRecordBox,

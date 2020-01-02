@@ -77,6 +77,9 @@
         font-size: 18px;
         font-weight: 600;
     }
+    .summary-value:focus{
+        border: transparent;
+    }
     .gross-count-items{
         font-size: 16px;
         font-weight: 600;
@@ -156,7 +159,7 @@
                             </select>
                         </td>
                         <td tabIndex="-1" contenteditable="true" class="prod-unit-price" data-text="Price" ></td>
-                        <td tabIndex="-1" no-tab contenteditable="false" class="prod-total" data-text="Total"></td>
+                        <td tabIndex="-1" no-tab contenteditable="false" class="prod-total" data-text="autofill"></td>
                         <td tabIndex="-1" no-tab>
                             <button class="btn btn-xs btn-default action-add-row"><small><span class="glyphicon glyphicon-plus"></span></small></button>
                             <button class="btn btn-xs btn-danger action-remove-row" data-toggle="tooltip" title="Only mouse click allowed">
@@ -172,16 +175,19 @@
                 <div class="summary-row"><span><b>ITEMS:</b> &nbsp;</span><span class="gross-count-items"></span> </div>
                 <div class="row summary-row" >
                     <div class="col-sm-8 summary-header ">TOTAL TRANSACTION</div>
-                    <div class="col-sm-4 summary-value gross-amount"></div>
+                    <div class="col-sm-4 summary-value gross-amount" contenteditable="false" data-text="autofill"></div>
                 </div>
                 <div class="row summary-row summary-cash-row" >
                     <div class="col-sm-8  summary-header">CASH  PAID</div>
-                    <div class="col-sm-4 summary-value gross-cash"></div>
+                    <div tabindex="-1" class="col-sm-4 summary-value gross-cash" contenteditable="true"></div>
                 </div>
                 <div class="row summary-row summary-cash-row">
                     <div class="col-sm-8  summary-header">AMOUNT  REMAINING</div>
-                    <div class="col-sm-4 summary-value gross-remaining"></div>
+                    <div class="col-sm-4 summary-value gross-remaining" contenteditable="false" data-text="autofill"></div>
                 </div>
+            </div>
+            <div class="transaction-action-box" style="text-align:center;margin-top:20px;">
+                <button tabIndex="-1" class="btn btn-primary save-transaction-btn">Save</button>
             </div>
             
         </div> <!-- tab pane end -->

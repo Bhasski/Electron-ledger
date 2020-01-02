@@ -39,7 +39,7 @@ var db_struct = {
             "<option value='ctn'>Carton(s)</option>"+
         "</select></td>"+
     "<td tabIndex='0' contenteditable='true' class='prod-unit-price' data-text='Price' ></td>"+
-    "<td tabIndex='-1' no-tab contenteditable='false' class='prod-total' data-text='Total'></td>"+
+    "<td tabIndex='-1' no-tab contenteditable='false' class='prod-total' data-text='autofill'></td>"+
     "<td tabIndex='0' no-tab>"+
     "<button class='btn btn-xs btn-default action-add-row'><small><span class='glyphicon glyphicon-plus'></span></small></button>"+
     "<button class='btn btn-xs btn-danger action-remove-row' data-toggle='tooltip' title='Only mouse click allowed' >"+
