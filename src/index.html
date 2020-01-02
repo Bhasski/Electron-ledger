@@ -47,6 +47,9 @@
         color: rgb(207, 206, 206);
         
     }
+    .bt-sidebar-nav li:last-child a{
+        border-top: solid 1px rgba(51,51,56,1);
+    }
     
     .bt-sidebar-nav li a:hover{
         background-color: rgb(138, 139, 156)!important;
@@ -143,7 +146,7 @@
     #bt-transaction-top-param-box>div{
         border: solid 1px #dedede;
         padding: 10px;
-        margin:0px 75px
+        margin:0px 30px
     }
 
     #bt-modal-on-table-column{
@@ -216,6 +219,9 @@
         top:20%;
         box-shadow:  0 0 15px rgb(186, 233, 255);
     }
+
+
+
     /* modified bootstrap */
     .navbar{
         border-radius: unset;
@@ -297,9 +303,9 @@
                     
                     <ul class="nav bt-sidebar-nav">
                         <li class="active"><a href="#" data-file="inventory.html" >Inventory</a></li>
-                        <li class=""><a href="#"  data-file="transaction.html" >Transaction</a></li>
+                        <li class=""><a href="#" id="default" data-file="transaction.html" >Transaction</a></li>
                         <li class=""><a href="#" data-file="report.html" >Report</a></li>
-                        <li ><a href="#" id="default" data-file="setup.html" >Set up</a></li>
+                        <li ><a href="#"  data-file="setup.html" >Set up</a></li>
                     </ul>
                 </div>
                 
@@ -344,6 +350,7 @@
 
 <script>window.$ = window.jQuery = require('../assets/js/jquery.min.js')</script>
 <script src="./btDashboard.js"></script>
+<script src="../assets/js/popper.min.js"></script>
 <script src="../assets/js/bootstrap.min3.js"></script>
 <script src="../assets/js/bootstrap-datetimepicker.min.js"></script>
 

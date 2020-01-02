@@ -57,8 +57,8 @@ function getWindowBounds(remote){
         /* App default launch nav state */
         if(global_shared !== undefined){
             var isSetUpNeeded = global_shared.isSetUpNeeded;
+            console.log("is set up needed : ",isSetUpNeeded)
             if(isSetUpNeeded){
-                console.log("is set up needed : ",isSetUpNeeded)
                 var setupElem = sidebar_navs[sidebar_navs.length-1]
                 setTimeout(function(){
                     setupElem.click();
@@ -68,7 +68,7 @@ function getWindowBounds(remote){
                 setTimeout(function(){
                     defaultElem.click(); //hack for click
                     my_html_magic_lib.sendTableForRecordBox("Product") //Product is hard coded state already
-                },20)
+                },10)
             }// end if else 
             
             
@@ -149,7 +149,7 @@ function getWindowBounds(remote){
         })//key up
         
         document.getElementById("bt-add-content-box").addEventListener("mousedown",my_html_magic_lib.actionOnMouseKey)//mouse down
-        
+
         
         
         
@@ -195,6 +195,9 @@ function getWindowBounds(remote){
                 }
             }
             modalEl.innerHTML =htmlStr;
+            setTimeout(() => {
+                my_html_magic_lib.showTableColumnModal(data.modalOptions)
+            }, 20);
         })// ipc for tx table modal
         
         
