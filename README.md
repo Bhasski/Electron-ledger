@@ -1,5 +1,5 @@
 # Electron-ledger
-This is the sample I am building at local machine (my old vaio)
+This is the sample I am building at local machine 
 
 
 1) install node.js - get the installer for your machine 
@@ -15,4 +15,4 @@ This is the sample I am building at local machine (my old vaio)
 
 
 NOTE: For Windows you need  to have Visual Studio and v140+ compile tools ... 
-Weird but so much big size tool is what stated compiling on my pc 
+Weird but so much big size tool is what started compiling on my pc 
