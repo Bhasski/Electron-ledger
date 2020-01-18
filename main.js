@@ -31,6 +31,7 @@ contextMenu({
   ]
 });
 
+/* END CONTEXT MENU */
 
 
 const path = require('path')

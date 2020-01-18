@@ -112,8 +112,8 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
                 })
             }else{
                 document.querySelectorAll(".summary-cash-row").forEach((row)=>{
-                    row.style.display="none"
                     _removeTabIndexToCashCol()
+                    row.style.display="none"
                 })
             }
         }// if cash switch in transaction page
@@ -149,7 +149,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
         let businessInput = that.querySelector("#business-name")
         
         let cashCol = document.querySelector("#ledger-summary-box .gross-cash")
-        cashCol.setAttribute("tabIndex",tabIndexForCashCol)
+        if (cashCol) cashCol.setAttribute("tabIndex",tabIndexForCashCol)
         setTimeout(() => {
             if(!businessInput.value) businessInput.focus()
             if(businessInput.value) lastRowFirstCol.focus()
@@ -158,7 +158,8 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
     }
 
     function _removeTabIndexToCashCol(){
-        document.querySelector("#ledger-summary-box .gross-cash").setAttribute("tabIndex","-1")
+        let cashCol = document.querySelector("#ledger-summary-box .gross-cash")
+        cashCol.setAttribute("tabIndex","-1")
     }
 
     function showAddModal(filePath){ // add Product or Business or Master
@@ -193,7 +194,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
                 todayHighlight: 1,
                 forceParse: 0,
             });
-        },15)
+        },30)
     }
     
     
@@ -528,7 +529,7 @@ var my_html_magic_lib = my_html_magic_lib || (function(){
             
             // any get-data Elem
             let grossCashCol = document.querySelector("#ledger-summary-box .gross-cash") ;
-            if(grossCashCol.style.display !="none"){
+            if(grossCashCol && grossCashCol.style.display !="none"){
                 grossCashCol.setAttribute("tabIndex",(tabIndexForSiblings+2))
             }
             let actionBtn = document.querySelector(".transaction-action-box button.save-transaction-btn")

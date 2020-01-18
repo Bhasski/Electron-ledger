@@ -1,6 +1,6 @@
 <style>
-    /* The switch - the box around the slider */
-    .switch {
+    /* The bt-switch - the box around the slider */
+    .bt-switch {
         position: relative;
         display: inline-block;
         width: 30px;
@@ -8,7 +8,7 @@
     }
     
     /* Hide default HTML checkbox */
-    .switch input {
+    .bt-switch input {
         opacity: 0;
         width: 0;
         height: 0;
@@ -124,7 +124,7 @@
                 </div>
                 <div class="col-sm-2">
                     <label for="cash-switch">Cash Paid</label>
-                    <label  class="switch">
+                    <label  class="bt-switch">
                         <input id="cash-switch" tabindex="-1"  type="checkbox">
                         <span class="slider round" data-toggle="tooltip" title="use mouse click"></span>
                     </label>
@@ -132,7 +132,7 @@
             </div>
         </div>
         
-        <table class="table table-bordered table-condensed" id="business-transaction-table">
+        <table class="table table-bordered table-condensed bt-table" id="business-transaction-table">
             <thead>
                 <th class="col-sm-2">Product</th>
                 <th class="col-sm-2">Manufacturer</th>
@@ -171,7 +171,7 @@
             </table>
             
             
-            <div  id="ledger-summary-box"  style="padding:0px 15px; text-align: center;" >
+            <div id="ledger-summary-box"  style="padding:0px 15px; text-align: center;" >
                 <div class="summary-row"><span><b>ITEMS:</b> &nbsp;</span><span class="gross-count-items"></span> </div>
                 <div class="row summary-row" >
                     <div class="col-sm-8 summary-header ">TOTAL TRANSACTION</div>

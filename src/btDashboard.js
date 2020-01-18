@@ -179,7 +179,7 @@ function getWindowBounds(remote){
                 }
                 tHeadStr += "<th>Action</th></thead>"
                 tBodyStr += "</tbody>"
-                let htmlStr = "<table class=\"table table-bordered table-condensed table-hover table-striped\">"+tHeadStr+tBodyStr+"</table>"
+                let htmlStr = "<table class=\"table bt-table table-bordered table-condensed table-hover table-striped\">"+tHeadStr+tBodyStr+"</table>"
                 if(recordEl) recordEl.innerHTML = htmlStr// let record box be there
                 
             }// if not empty
