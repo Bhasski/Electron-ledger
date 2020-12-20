@@ -20,3 +20,7 @@ Weird but so much big size tool is what started compiling on my pc
 7) Run the  start script -> npm start
 
 
+![Alt text](screens/transaction.JPG?raw=true "Transaction screen")
+![Alt text](screens/db_populated_dropdowns-tx.JPG?raw=true "Populated dropdowns")
+![Alt text](screens/admin-add.JPG?raw=true "Add admin")
+![Alt text](screens/admin.JPG?raw=true "Optional Title")
