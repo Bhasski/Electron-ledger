@@ -1,6 +1,6 @@
 # Electron-ledger
 This is the sample I am building at local machine 
-
+Author: Bhaskar Taneja
 
 1) install node.js - get the installer for your machine 
 2) get npm - node-package-manager
